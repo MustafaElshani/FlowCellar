@@ -7,7 +7,7 @@ names all three.
 
 The description of the package, the opening of the README and the first line of `flowcellar --help` now say
 what FlowCellar is: one QC library for all your Oxford Nanopore flow cells, with the QC of sequencing,
-basecalling, alignment and analysis in one place. Nothing else changed.
+basecalling and alignment in one place. Nothing else changed.
 
 ### Known limits
 

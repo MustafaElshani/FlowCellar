@@ -3,8 +3,8 @@
 FlowCellar is one quality control (QC) library for all your Oxford Nanopore flow cells. It finds every run under
 the folders you name, wherever it was moved to: the sequencer's disk, a project share, an archive. It reads what
 MinKNOW wrote and, when they exist, the basecalled and aligned reads and the single-cell and spatial analyses,
-and keeps one small file per run in a **library**, so that the QC of sequencing, basecalling, alignment and
-analysis is in one place, to search and compare in a browser, with or without a server.
+and keeps one small file per run in a **library**, so that the QC of sequencing, basecalling and
+alignment is in one place, to search and compare in a browser, with or without a server.
 
 | Page | What is in it |
 |---|---|

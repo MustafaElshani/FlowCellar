@@ -6,7 +6,7 @@
 </p>
 
 FlowCellar is one quality control (QC) library for all your Oxford Nanopore flow cells: it finds every run
-wherever its folder now lies and puts the QC of sequencing, basecalling, alignment and analysis in one place,
+wherever its folder now lies and puts the QC of sequencing, basecalling and alignment in one place,
 for you to search and compare in a browser.
 
 <p align="center">
@@ -31,9 +31,10 @@ happens after sequencing is what makes the runs hard to keep track of:
 - **One report at a time compares nothing.** It does not say how this flow cell compares with the last twenty,
   which runs need a look, or what happened to a library preparation over the months of a project.
 
-FlowCellar brings this together. It finds every run under the folders you name, wherever it was moved to, attaches
-the basecalled, aligned and analysed reads to the flow cell they came from, and shows the QC of the run, of the
-basecalled reads and of the analyses in one place: per flow cell, per project, and side by side.
+FlowCellar brings this together in one QC dashboard. It finds every run under the folders you name, wherever it
+was moved to, attaches the basecalled and aligned reads to the flow cell they came from, and shows the QC of
+sequencing, basecalling and alignment in one place: per flow cell, per project, and side by side. It is not an
+analysis tool: it reports on the quality of your runs and leaves the biology to your pipelines.
 
 ## The idea
 
