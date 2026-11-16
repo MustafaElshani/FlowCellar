@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 name = "flowcellar"
 # The long description is README.md with its paths made into addresses (hatch_build.py): relative paths lead nowhere on PyPI.
 dynamic = ["version", "readme"]
-description = "Quality control for Oxford Nanopore sequencing runs: a library of small per-run bundles and one viewer that works offline."
+description = "One QC library for all your Oxford Nanopore flow cells: every run, wherever it is stored, with its basecalling, alignment and analysis QC, to search and compare in a browser."
 # GNU General Public License, version 3 or any later version.
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]

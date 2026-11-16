@@ -50,7 +50,7 @@ class _Group(click.Group):
 @click.version_option(__version__, "--version", prog_name="flowcellar", message="%(prog)s %(version)s")
 @click.pass_context
 def cli(ctx, library, config, jobs, threads, verbose, quiet, log_format):
-    """FlowCellar: quality control for Oxford Nanopore sequencing runs.
+    """FlowCellar: one QC library for all your Oxford Nanopore flow cells, wherever their runs are stored.
 
     \b
       flowcellar scan /place/one /place/two -L ~/flowcellar-library     build or update a library

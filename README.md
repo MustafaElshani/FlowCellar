@@ -5,9 +5,9 @@
   </picture>
 </p>
 
-FlowCellar is quality control for Oxford Nanopore sequencing: point it at the folders your runs and analyses are
-in, and it builds one searchable library of every run it finds, each with a verdict and its reasons, that you
-explore in a browser.
+FlowCellar is one quality control (QC) library for all your Oxford Nanopore flow cells: it finds every run
+wherever its folder now lies, gives it a verdict with the reasons, and puts its basecalling, alignment and
+analysis QC beside it, for you to search and compare in a browser.
 
 <p align="center">
   <img src="docs/img/home.png" alt="The Home page of a FlowCellar library: runs that need attention, the latest runs with their verdicts and output, and the projects with their runs, flow cells, samples and verdicts." width="900">

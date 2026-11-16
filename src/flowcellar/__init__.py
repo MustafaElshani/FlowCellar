@@ -1,4 +1,4 @@
-"""FlowCellar: quality control for Oxford Nanopore sequencing runs."""
+"""FlowCellar: one QC library for all your Oxford Nanopore flow cells."""
 from flowcellar._version import __version__
 
 #: Version of the bundle schema this package writes (src/flowcellar/model/schemas/).

@@ -29,7 +29,8 @@ They go before the command name. `-L` is also accepted after it.
 ```text
 Usage: flowcellar [OPTIONS] COMMAND [ARGS]...
 
-  FlowCellar: quality control for Oxford Nanopore sequencing runs.
+  FlowCellar: one QC library for all your Oxford Nanopore flow cells, wherever their runs are
+  stored.
 
     flowcellar scan /place/one /place/two -L ~/flowcellar-library     build or update a library
     flowcellar serve ~/flowcellar-library --open                      look at it
