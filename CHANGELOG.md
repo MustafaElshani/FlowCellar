@@ -3,6 +3,16 @@
 Versions of the package, the bundle schema and the metric catalogue are counted separately; each entry
 names all three.
 
+## 0.1.1 (November 2026)
+
+The description of the package, the opening of the README and the first line of `flowcellar --help` now say
+what FlowCellar is: one QC library for all your Oxford Nanopore flow cells, with the QC of sequencing,
+basecalling, alignment and analysis in one place. Nothing else changed.
+
+### Known limits
+
+As in 0.1.0, below.
+
 ## 0.1.0 (November 2026)
 
 The first public release. Bundle schema 0.1.1, metric catalogue 0.1.1, library layout 1.

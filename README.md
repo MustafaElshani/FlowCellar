@@ -6,8 +6,8 @@
 </p>
 
 FlowCellar is one quality control (QC) library for all your Oxford Nanopore flow cells: it finds every run
-wherever its folder now lies, gives it a verdict with the reasons, and puts its basecalling, alignment and
-analysis QC beside it, for you to search and compare in a browser.
+wherever its folder now lies and puts the QC of sequencing, basecalling, alignment and analysis in one place,
+for you to search and compare in a browser.
 
 <p align="center">
   <img src="docs/img/home.png" alt="The Home page of a FlowCellar library: runs that need attention, the latest runs with their verdicts and output, and the projects with their runs, flow cells, samples and verdicts." width="900">
@@ -74,7 +74,7 @@ flowcellar doctor
 `doctor` prints the versions and says whether the viewer is inside the package:
 
 ```
-flowcellar 0.1.0 · bundle schema 0.1.1 · Python 3.12.5 · Linux x86_64
+flowcellar 0.1.1 · bundle schema 0.1.1 · Python 3.12.5 · Linux x86_64
 packages: numpy 2.5.4, pyarrow 26.0.1, click 8.5.1, pysam 0.24.1, jsonschema 4.26.0, h5py 3.16.0
   ok    viewer: the built viewer is in the package (4 files, hashes match)
 (add -L DIR to check a library and its roots)
