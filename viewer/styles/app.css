@@ -1,0 +1,805 @@
+/* FlowCellar: layout of the screens. Uses only --fc-* tokens (tokens.css) and builds on the component styles
+ * (components.css). No colour is written here as a literal. */
+
+html { background: var(--fc-page); }
+body.fc { min-height: 100vh; overflow-y: scroll; }
+/* One gutter for every screen. The content of the application bar, every page and the bars of the Runs table start and end on the same two lines, at
+   any width: nothing jumps from tab to tab. No screen is a centred column: every screen takes the whole window, as the Runs table always did. */
+.fc { --fc-gutter: var(--fc-space-16); }
+@media (max-width: 640px) { .fc { --fc-gutter: var(--fc-space-8); } }
+.fc-boot, .fc-loading { padding: var(--fc-space-24) var(--fc-space-16); color: var(--fc-text-secondary); }
+.fc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.fc-skip { position: absolute; left: -9999px; }
+.fc-skip:focus { position: static; display: inline-block; padding: var(--fc-space-4) var(--fc-space-8); }
+.fc-nowrap { white-space: nowrap; }
+.fc-break { overflow-wrap: anywhere; white-space: normal !important; }
+.fc-grow { flex: 1; }
+.fc-linkbtn { all: unset; cursor: pointer; color: var(--fc-accent-text); text-decoration: underline; text-underline-offset: 2px; font: inherit; }
+.fc-linkbtn:hover { text-decoration-thickness: 2px; }
+.fc-notice { color: var(--fc-text-secondary); }
+.fc-id { font-weight: var(--fc-weight-strong); }
+.fc-trunc-mid { vertical-align: bottom; }
+
+/* ---- form controls that the reference styles do not cover ---- */
+.fc-selectbox { height: var(--fc-control-h); padding: 0 var(--fc-space-6); border: var(--fc-border-w) solid var(--fc-border-control); border-radius: var(--fc-radius-2); background: var(--fc-surface); color: var(--fc-text); font: var(--fc-size-small)/1 var(--fc-font-sans); max-width: 260px; cursor: pointer; }
+.fc-select.is-off, .fc-select.is-fixed { cursor: default; }
+.fc-select.is-off { text-decoration: line-through; }
+.fc-select.is-off::after, .fc-select.is-fixed::after { display: none; }
+.fc input[type="number"] { width: 58px; height: var(--fc-control-h); padding: 0 var(--fc-space-4); border: var(--fc-border-w) solid var(--fc-border-control); border-radius: var(--fc-radius-2); background: var(--fc-surface); color: var(--fc-text); font: var(--fc-size-small)/1 var(--fc-font-sans); font-variant-numeric: tabular-nums; }
+.fc input[type="checkbox"] { width: 14px; height: 14px; margin: 0; accent-color: var(--fc-accent); vertical-align: -2px; }
+.fc-seg > button { font-family: inherit; }
+.fc-seg > .is-off { text-decoration: line-through; }
+.fc-timefield, .fc-custom label { display: inline-flex; align-items: center; gap: var(--fc-space-4); font-size: var(--fc-size-small); color: var(--fc-text-secondary); }
+.fc-custom { gap: var(--fc-space-8); }
+
+/* ---- application bar ---- */
+.fc-appbar { position: sticky; top: 0; z-index: calc(var(--fc-z-sticky) + 2); }
+.fc-appbar__logo svg { height: 22px; }
+.fc-appbar a.fc-tab { text-decoration: none; }
+.fc-appbar__search { flex: 1 1 320px; max-width: 640px; min-width: 160px; }
+.fc-search--inverse .fc-search__input::placeholder { color: var(--fc-text-inverse-muted); }
+.fc-appbar .fc-btn.is-quiet { color: var(--fc-text-inverse-muted); }
+.fc-seg--inverse { background: transparent; border-color: var(--fc-border-inverse); margin-left: auto; }
+.fc-seg--inverse > * { color: var(--fc-text-inverse-muted); border-left-color: var(--fc-border-inverse); }
+.fc-seg--inverse > *:hover { background: rgba(255, 255, 255, 0.08); color: var(--fc-text-inverse); }
+.fc-seg--inverse > [aria-checked="true"] { background: var(--fc-text-inverse); color: var(--fc-surface-inverse); }
+.fc-crumbs { margin: 0 calc(-1 * var(--fc-gutter)); padding-left: var(--fc-gutter); padding-right: var(--fc-gutter); }
+
+/* ---- pages ---- */
+.fc-page { padding: 0 var(--fc-gutter) var(--fc-space-64); }
+.fc-page__empty { margin-top: var(--fc-space-16); }
+.fc-grid { display: grid; gap: var(--fc-space-12); margin-top: var(--fc-space-12); align-items: start; }
+.fc-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fc-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.fc-grid--map { grid-template-columns: minmax(0, 2.3fr) minmax(280px, 1fr); }
+.fc-grid--why { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+.fc-grid--maps { grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); }
+.fc-grid > .fc-empty { align-self: stretch; }
+
+/* ---- hub ---- */
+.fc-hub { display: flex; flex-direction: column; height: calc(100vh - var(--fc-appbar-h)); background: var(--fc-surface); }
+.fc-viewbar, .fc-filterbar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--fc-space-6) var(--fc-space-16); padding: var(--fc-space-6) var(--fc-gutter); border-bottom: var(--fc-border-w) solid var(--fc-border); font-size: var(--fc-size-small); }
+.fc-viewbar { background: var(--fc-surface-sunken); }
+.fc-viewbar__count { margin-left: auto; color: var(--fc-text-secondary); }
+.fc-viewbar__cols { color: var(--fc-text); }
+.fc-filterbar { min-height: 36px; gap: var(--fc-space-6) var(--fc-space-8); }
+.fc-filterbar__notice { margin-left: auto; font-size: var(--fc-size-caption); }
+.fc-hub__main { flex: 1; display: flex; min-height: 0; }
+.fc-facets { flex: none; width: var(--fc-facets-w); overflow-y: auto; padding: var(--fc-space-8) var(--fc-space-12) var(--fc-space-24) var(--fc-gutter); border-right: var(--fc-border-w) solid var(--fc-border); background: var(--fc-surface); }
+.fc-facets.is-rail { width: 40px; padding: var(--fc-space-8) 5px; background: var(--fc-surface-sunken); overflow: hidden; }
+.fc-facets__btn { writing-mode: vertical-rl; height: auto; width: 28px; padding: var(--fc-space-8) 0; }
+.fc-facets__head { display: flex; justify-content: space-between; align-items: center; }
+.fc-facet { border: 0; margin: var(--fc-space-8) 0 0; padding: 0; min-width: 0; }
+.fc-facet legend { padding: 0; margin-bottom: var(--fc-space-2); }
+.fc-facet__row { cursor: pointer; }
+.fc-facet__name { display: inline-flex; align-items: center; gap: var(--fc-space-6); min-width: 0; overflow: hidden; white-space: nowrap; }
+.fc-hub__table { flex: 1; min-width: 0; overflow: auto; position: relative; }
+.fc-table--hub { table-layout: fixed; }
+.fc-table--hub th { position: sticky; top: 0; z-index: 2; height: 38px; }
+.fc-table--hub th.fc-num > button { justify-content: flex-end; text-align: right; width: 100%; }
+.fc-table--hub th > button { flex-direction: column; align-items: flex-start; gap: 0; }
+.fc-table--hub th.fc-num > button { align-items: flex-end; }
+.fc-table--hub th.is-on { color: var(--fc-text); }
+.fc-table .fc-table__sub { font-weight: var(--fc-weight-regular); }
+.fc-table--hub td, .fc-table--hub tbody th { height: var(--fc-row-hub); padding: 0 var(--fc-space-6); border-bottom: var(--fc-border-w) solid var(--fc-border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font-weight: var(--fc-weight-regular); background: transparent; line-height: 1.25; vertical-align: middle; }
+.fc-table--hub td.fc-num { text-align: right; }
+.fc-table--hub tbody tr { cursor: pointer; }
+.fc-table--hub tbody tr:hover > * { background: var(--fc-surface-hover); }
+.fc-table--hub tr.is-selected > * { background: var(--fc-surface-selected); }
+.fc-table--hub tr.is-marked > * { background: var(--fc-accent-subtle); }
+.fc-table--hub tr.is-marked > :first-child { box-shadow: inset 3px 0 0 var(--fc-accent); }
+.fc-table--hub .c-tick { text-align: center; padding: 0; }
+.fc-table--hub .c-peek { padding: 0 2px; text-align: center; }
+.fc-table--hub .fc-table__group td { height: 30px; cursor: default; background: var(--fc-surface-sunken); font-weight: var(--fc-weight-strong); }
+.fc-table--hub tbody tr.fc-table__group:hover > * { background: var(--fc-surface-sunken); }
+.fc-peekbtn { width: 26px; height: 26px; min-width: 0; border-color: transparent; background: transparent; color: var(--fc-text-muted); font-size: 16px; }
+tr:hover .fc-peekbtn, .fc-peekbtn[aria-pressed="true"] { border-color: var(--fc-border-control); color: var(--fc-text); }
+.fc-reuse { margin-left: var(--fc-space-6); font-size: var(--fc-size-caption); color: var(--fc-text-secondary); }
+.fc-cell__sub .fc-trunc-mid { max-width: 100%; }
+.c-fc .fc-cell__sub { display: block; }
+.fc-hub__empty { margin: var(--fc-space-16); }
+.fc-tray { border-radius: 0; flex: none; padding-left: var(--fc-gutter); padding-right: var(--fc-gutter); }
+.fc-tray__ids { color: var(--fc-text-inverse-muted); }
+.fc-tray__hint { color: var(--fc-text-inverse-muted); }
+
+/* ---- peek drawer ---- */
+.fc-peek { flex: none; width: var(--fc-drawer-w); overflow-y: auto; padding: var(--fc-space-12); border-left: var(--fc-border-w) solid var(--fc-border-strong); background: var(--fc-surface-raised); box-shadow: var(--fc-shadow-3); z-index: 3; font-size: var(--fc-size-table); }
+.fc-peek__head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--fc-space-8); }
+.fc-peek__id { font-size: var(--fc-size-lead); font-weight: var(--fc-weight-strong); }
+.fc-peek__name { overflow-wrap: anywhere; color: var(--fc-text-secondary); }
+.fc-peek__badges { display: flex; align-items: center; flex-wrap: wrap; gap: var(--fc-space-6); margin-top: var(--fc-space-8); font-size: var(--fc-size-small); }
+.fc-peek__badges > span { display: inline-flex; align-items: center; gap: var(--fc-space-6); white-space: nowrap; margin-right: var(--fc-space-8); }
+.fc-peek__headline { margin-top: var(--fc-space-8); font-weight: var(--fc-weight-strong); }
+.fc-peek__tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: var(--fc-space-8); }
+.fc-peek__tiles .fc-tile { padding: var(--fc-space-6) var(--fc-space-8); }
+.fc-peek__tiles .fc-tile__label { font-size: var(--fc-size-caption); }
+.fc-peek__tiles .fc-tile__value { font-size: var(--fc-size-lead); }
+.fc-peek__note { margin-top: var(--fc-space-6); font-size: var(--fc-size-caption); }
+.fc-peek .fc-chart { margin-top: var(--fc-space-12); }
+.fc-peek__actions { display: flex; flex-wrap: wrap; gap: var(--fc-space-6); margin-top: var(--fc-space-16); }
+
+/* ---- run header, verdict, key numbers ---- */
+.fc-runhead { padding: var(--fc-space-12) 0 var(--fc-space-8); }
+.fc-runhead__row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--fc-space-6) var(--fc-space-12); }
+.fc-runhead__id { font-size: var(--fc-size-title); line-height: var(--fc-lh-tight); font-weight: var(--fc-weight-strong); }
+.fc-runhead__name { font-weight: var(--fc-weight-strong); max-width: 340px; min-width: 0; display: inline-flex; }
+.fc-runhead__chips { display: flex; flex-wrap: wrap; gap: var(--fc-space-4) var(--fc-space-6); }
+.fc-runhead__actions { margin-left: auto; display: flex; gap: var(--fc-space-6); }
+.fc-runhead__line { margin-top: var(--fc-space-4); font-size: var(--fc-size-small); color: var(--fc-text-secondary); }
+.fc-verdict__head > div { flex: 1; min-width: 0; }
+.fc-verdict__detail { max-width: 110ch; }
+.fc-verdict__headline { max-width: 100ch; }
+.fc-nowrap { white-space: nowrap !important; }
+.fc-section__reading { max-width: 110ch; }
+.fc-chart__reading { max-width: 90ch; }
+.fc-verdict__all { margin-left: auto; height: 22px; }
+.fc-verdict__absent p + p { margin-top: var(--fc-space-4); }
+.fc-verdict__absent { margin-top: var(--fc-space-6); font-size: var(--fc-size-table); }
+.fc-verdict__note { max-width: 110ch; }
+.fc-verdict__note.fc-notice::before, .fc-section__note.fc-notice::before, .fc-peek__note.fc-notice::before, .fc-compare__notices .fc-notice::before, .fc-filterbar__notice::before { color: var(--fc-text-muted); }
+.fc-allchecks { margin-top: var(--fc-space-8); border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-2); max-height: 420px; overflow: auto; }
+.fc-table--wrap td, .fc-table--wrap tbody th { white-space: normal; height: auto; min-height: var(--fc-row-compact); padding-top: var(--fc-space-4); padding-bottom: var(--fc-space-4); }
+.fc-table tbody th { text-align: left; font-weight: var(--fc-weight-regular); padding: var(--fc-space-2) var(--fc-space-6); border-bottom: var(--fc-border-w) solid var(--fc-border); background: transparent; color: var(--fc-text); font-size: inherit; height: var(--fc-row-compact); white-space: nowrap; }
+.fc-table--wrap tbody th { white-space: normal; }
+.fc-table--comfortable tbody th { height: var(--fc-row); }
+.fc-keynumbers { margin-top: var(--fc-space-12); }
+.fc-keynumbers .fc-tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.fc-keynumbers__note { margin-top: var(--fc-space-4); font-size: var(--fc-size-caption); color: var(--fc-text-muted); }
+.fc-keynumbers__note .fc-sw { display: inline-block; vertical-align: -1px; margin: 0 2px; }
+.fc-tile { display: flex; flex-direction: column; }
+.fc-tile__caption { display: block; white-space: normal; }
+.fc-tile__value { overflow: hidden; text-overflow: ellipsis; }
+.fc-tile__label > span:first-child { overflow-wrap: anywhere; }
+.fc-track__label .fc-tag { white-space: normal; margin-top: var(--fc-space-4); }
+.fc-tile .fc-strip { display: block; }
+.fc-tile .fc-strip__band, .fc-tile .fc-strip__mark, .fc-tile .fc-strip__limit { display: block; }
+a.fc-tile:hover { text-decoration: none; }
+.fc-section__tiles { margin-top: var(--fc-space-8); grid-template-columns: repeat(6, minmax(0, 1fr)); }
+
+/* ---- controls bar, rail, sections ---- */
+.fc-sentinel { height: 1px; margin-top: var(--fc-space-12); }
+.fc-controls { margin: 0 calc(-1 * var(--fc-gutter)); padding-left: var(--fc-gutter); padding-right: var(--fc-gutter); }
+.fc-runcontrols { position: sticky; top: var(--fc-appbar-h); z-index: var(--fc-z-sticky); box-shadow: var(--fc-shadow-1); gap: var(--fc-space-6) 10px; }
+.fc-runcontrols .fc-selectbox { max-width: 168px; }
+.fc-runcontrols input[type="number"] { width: 46px; }
+.fc-runcontrols .fc-custom label:last-child input { width: 68px; }
+.fc-runcontrols .fc-seg > * { padding: 0 7px; }
+.fc-runcontrols .fc-ctrl { gap: 5px; }
+.fc-runcontrols__id { display: none; align-items: center; gap: var(--fc-space-4); font-weight: var(--fc-weight-strong); font-size: var(--fc-size-table); }
+.fc-runcontrols.is-stuck .fc-runcontrols__id { display: inline-flex; }
+.fc-runbody { display: grid; grid-template-columns: var(--fc-rail-w) minmax(0, 1fr); align-items: start; }
+.fc-runrail { position: sticky; top: calc(var(--fc-appbar-h) + 86px); max-height: calc(100vh - var(--fc-appbar-h) - 96px); overflow-y: auto; border-right: 0; background: transparent; margin-left: calc(-1 * var(--fc-gutter)); padding-top: var(--fc-space-12); }
+.fc-runrail .fc-rail__item { text-decoration: none; }
+.fc-runmain { min-width: 0; border-left: var(--fc-border-w) solid var(--fc-border); }
+.fc-section { scroll-margin-top: calc(var(--fc-appbar-h) + 96px); padding-bottom: var(--fc-space-16); }
+.fc-section__tools { margin-left: auto; display: inline-flex; align-items: center; gap: var(--fc-space-8); }
+.fc-section__note { margin-top: var(--fc-space-8); font-size: var(--fc-size-small); color: var(--fc-text-secondary); max-width: 120ch; }
+.fc-section.is-evidence { outline-offset: -2px; }
+.fc-details [data-sec] { scroll-margin-top: calc(var(--fc-appbar-h) + 96px); }
+.fc-disclosure__body { padding: var(--fc-space-8) 0 var(--fc-space-4); }
+.fc-disclosure__body > .fc-grid:first-child { margin-top: 0; }
+.fc-readcard { margin-top: var(--fc-space-8); gap: var(--fc-space-8); }
+.fc-readcard__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--fc-space-8) var(--fc-space-24); }
+.fc-readcard__grid dt { font-weight: var(--fc-weight-strong); color: var(--fc-text); }
+.fc-kv th { width: 220px; color: var(--fc-text-secondary) !important; }
+.fc-samples tbody tr { cursor: pointer; }
+.fc-samples__name { color: var(--fc-text); font-weight: var(--fc-weight-strong); max-width: 300px; display: inline-flex; }
+
+/* ---- charts ---- */
+.fc-chart { margin: 0; min-width: 0; }
+.fc-chart--flat { border: 0; padding: 0; background: transparent; }
+.fc-chart.is-evidence, .fc-track.is-evidence { outline: 2px solid var(--fc-evidence-line); outline-offset: 2px; position: relative; z-index: 1; }
+.fc-chart__meta { flex-wrap: wrap; align-items: flex-start; }
+.fc-chart__tag { white-space: normal; text-align: right; }
+.fc-chart__how { margin-top: var(--fc-space-4); font-size: var(--fc-size-small); color: var(--fc-text-secondary); max-width: var(--fc-measure); }
+.fc-chart__foot { display: flex; align-items: center; flex-wrap: wrap; gap: var(--fc-space-8) var(--fc-space-16); margin-top: var(--fc-space-8); }
+.fc-chart__foot .fc-legend { margin-top: 0; }
+.fc-chart__note { font-size: var(--fc-size-caption); flex-basis: 100%; }
+.fc-chart--map .fc-plot { margin-left: auto; margin-right: auto; }
+.fc-scale__none { margin-left: var(--fc-space-8); }
+.fc-plot { position: relative; width: 100%; margin-top: var(--fc-space-4); border-radius: var(--fc-radius-1); }
+.fck canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+/* the note beside the cell of a map the pointer is on: it lies over the plot, takes no room and never takes the pointer */
+.fc-tip { position: absolute; left: 0; top: 0; z-index: 2; max-width: none; white-space: nowrap; pointer-events: none; font-variant-numeric: tabular-nums; }
+.fc-tip[hidden] { display: none; }
+.fck-over { touch-action: pan-y; cursor: crosshair; }
+.fc-legend__btn { all: unset; display: inline-flex; align-items: center; gap: var(--fc-space-6); cursor: pointer; white-space: nowrap; }
+.fc-sw--limit { border-top-style: dashed; }
+.fc-charttable { margin-top: var(--fc-space-8); max-height: 260px; overflow: auto; border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-2); }
+.fc-charttable__note { padding: var(--fc-space-4) var(--fc-space-8); font-size: var(--fc-size-caption); }
+.fc-tracks { margin-top: var(--fc-space-8); border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-3); background: var(--fc-chart-surface); }
+.fc-tracks__hint { margin-top: var(--fc-space-8); font-size: var(--fc-size-caption); color: var(--fc-text-muted); }
+.fc-track { display: grid; grid-template-columns: 172px minmax(0, 1fr); border-top: var(--fc-border-w) solid var(--fc-border); }
+.fc-track:first-child { border-top: 0; }
+.fc-track__label { padding: var(--fc-space-8); background: var(--fc-surface-sunken); border-right: var(--fc-border-w) solid var(--fc-border); min-width: 0; }
+.fc-track:first-child .fc-track__label { border-top-left-radius: var(--fc-radius-3); }
+.fc-track:last-child .fc-track__label { border-bottom-left-radius: var(--fc-radius-3); }
+.fc-track__title { font-size: var(--fc-size-table); font-weight: var(--fc-weight-strong); line-height: var(--fc-lh-dense); }
+.fc-track__sub { font-size: var(--fc-size-caption); color: var(--fc-text-muted); line-height: var(--fc-lh-dense); }
+/* the value under the cursor, in the label column: a box that keeps as many lines free as the longest read-out of its track needs (--fc-ro-lines, set once
+   by the track from its own numbers). The pointer changes the text in it and never its height, so no track and nothing under the timeline moves. */
+.fc-track__value { --fc-ro-lines: 2; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--fc-ro-lines); height: calc(var(--fc-ro-lines) * 15em / 11); margin-top: var(--fc-space-4); overflow: hidden; overflow-wrap: anywhere; font-size: var(--fc-size-caption); line-height: calc(15em / 11); color: var(--fc-text-secondary); font-variant-numeric: tabular-nums; }
+.fc-track__value b { color: var(--fc-text); }
+.fc-track__plot { min-width: 0; padding: var(--fc-space-4) 0 var(--fc-space-4); }
+.fc-track__plot .fc-plot { margin-top: 0; }
+.fc-track__plot .fc-legend { margin: 0 0 var(--fc-space-2) 58px; font-size: var(--fc-size-caption); gap: var(--fc-space-2) var(--fc-space-12); }
+.fc-track--na .fc-track__plot { padding: var(--fc-space-12); font-size: var(--fc-size-small); }
+.fc-runstrip { position: relative; height: 26px; margin-top: var(--fc-space-4); }
+.fc-runstrip__seg { position: absolute; top: 0; bottom: 0; box-sizing: border-box; border: var(--fc-border-w) solid var(--fc-border-control); border-radius: var(--fc-radius-1); background: var(--fc-surface-sunken); color: var(--fc-text); font-size: var(--fc-size-caption); line-height: 24px; overflow: hidden; white-space: nowrap; text-decoration: none; min-width: 3px; }
+.fc-runstrip__seg span { padding: 0 var(--fc-space-4); }
+.fc-runstrip__seg.is-restart { border-style: dashed; background: var(--fc-surface); }
+.fc-runstrip__seg:hover { border-color: var(--fc-text); }
+.fc-runstrip__list { list-style: none; display: flex; flex-wrap: wrap; gap: var(--fc-space-2) var(--fc-space-16); margin: var(--fc-space-6) 18px var(--fc-space-4) 58px; font-size: var(--fc-size-caption); color: var(--fc-text-secondary); }
+.fc-runstrip__list b { color: var(--fc-text); }
+
+/* ---- compare ---- */
+.fc-items { display: flex; flex-wrap: wrap; align-items: stretch; gap: var(--fc-space-8); padding: var(--fc-space-12) 0; }
+.fc-item { display: flex; align-items: center; gap: var(--fc-space-8); max-width: 420px; min-width: 0; padding: var(--fc-space-6) var(--fc-space-8); border: var(--fc-border-w) solid var(--fc-border-strong); border-radius: var(--fc-radius-3); background: var(--fc-surface); font-size: var(--fc-size-small); }
+.fc-item__letter { display: inline-flex; flex-direction: column; align-items: center; font-size: var(--fc-size-lead); line-height: 1; }
+.fc-item__letter b { color: var(--fc-text); }
+.fc-item__body { display: flex; flex-direction: column; min-width: 0; gap: var(--fc-space-2); }
+.fc-item__body > span:first-child { white-space: nowrap; }
+.fc-item__name { display: flex; min-width: 0; color: var(--fc-text-secondary); }
+.fc-compare__notices { flex-direction: column; align-items: flex-start; gap: var(--fc-space-2); margin: 0 calc(-1 * var(--fc-gutter)); padding-left: var(--fc-gutter); padding-right: var(--fc-gutter); border-top: var(--fc-border-w) solid var(--fc-border-strong); border-bottom: 0; }
+.fc-compare .fc-panel { margin-top: var(--fc-space-12); min-width: 0; }
+.fc-compare .fc-grid--why > .fc-panel { margin-top: 0; }
+.fc-panel__note { padding: 0 var(--fc-space-12) var(--fc-space-8); }
+.fc-diffbar { display: inline-block; width: 62px; height: 8px; vertical-align: middle; position: relative; background: linear-gradient(var(--fc-border-strong), var(--fc-border-strong)) center / 100% 1px no-repeat; }
+.fc-diffbar i { position: absolute; top: 0; bottom: 0; left: 0; background: var(--fc-div-pos-2); border-radius: 0 var(--fc-radius-1) var(--fc-radius-1) 0; }
+.fc-diffbar.is-neg i { background: var(--fc-div-neg-2); }
+.fc-spreadbar { display: inline-block; width: 42px; height: 8px; vertical-align: middle; box-shadow: inset 0 0 0 1px var(--fc-border); border-radius: var(--fc-radius-1); background: var(--fc-surface-sunken); }
+.fc-spreadbar i { display: block; height: 100%; background: var(--fc-text-secondary); border-radius: var(--fc-radius-1); }
+.fc-why-table td, .fc-why-table tbody th { vertical-align: top; }
+.fc-why-table td:last-child { min-width: 230px; }
+.fc-why-table th .fc-table__sub { white-space: normal; }
+.fc-difftable tbody th { width: 30%; }
+
+/* ---- flow cell history ---- */
+.fc-flowcell__summary { margin-top: 0; }
+.fc-flowcell__rule { margin-top: var(--fc-space-12); min-height: 0; }
+.fc-fcruns__reason { min-width: 220px; color: var(--fc-text-secondary); }
+.fc-flowcell .fc-keynumbers .fc-tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+
+@media print { .fc-runcontrols, .fc-facets, .fc-peek { display: none !important; } .fc-hub { height: auto; } }
+.fc-table tr.is-marked > th { background: var(--fc-accent-subtle); box-shadow: inset 3px 0 0 var(--fc-accent); }
+
+/* ---- start-up and the text summary (what a page shows before, or without, its script) ---- */
+.fc-boot--failed { max-width: 80ch; color: var(--fc-text); }
+.fc-nojs { padding-top: var(--fc-space-16); }
+.fc-nojs .fc-verdict { margin-top: var(--fc-space-12); }
+.fc-nojs__note { margin-top: var(--fc-space-16); max-width: 90ch; font-size: var(--fc-size-small); }
+.fc-appbar__what { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fc-size-small); color: var(--fc-text-inverse-muted); }
+.fc-linkbtn:disabled { color: var(--fc-text-muted); cursor: default; text-decoration: none; }
+.fc-linkbtn:focus-visible { outline: var(--fc-focus-outline); outline-offset: 2px; box-shadow: var(--fc-focus-ring); border-radius: var(--fc-radius-1); }
+.fc-updated { white-space: nowrap; }
+.fc-select.is-off:focus-visible { outline: var(--fc-focus-outline); outline-offset: 2px; }
+.fc-runfail { margin-top: var(--fc-space-12); border: var(--fc-border-w) solid var(--fc-border-strong); border-radius: var(--fc-radius-2); }
+.fc-partial { font-weight: var(--fc-weight-strong); color: var(--fc-text); }
+.fc-samples__name--off { color: var(--fc-text-secondary); font-weight: var(--fc-weight-regular); }
+.fc-track__menu { display: flex; flex-wrap: wrap; gap: var(--fc-space-2) var(--fc-space-8); margin-top: var(--fc-space-4); font-size: var(--fc-size-caption); }
+.fc-track__how { margin: var(--fc-space-4) 18px var(--fc-space-4) 58px; }
+.fc-track__plot .fc-charttable { margin: var(--fc-space-4) 18px var(--fc-space-6) 58px; }
+
+/* ---- Home ---- */
+.fc-home { padding-top: var(--fc-space-12); }
+.fc-home__head { display: flex; align-items: flex-end; flex-wrap: wrap; gap: var(--fc-space-8) var(--fc-space-24); }
+.fc-home__title { flex: 1 1 380px; min-width: 0; }
+.fc-home__name { font-size: var(--fc-size-title); line-height: var(--fc-lh-tight); font-weight: var(--fc-weight-strong); overflow-wrap: anywhere; }
+.fc-home__line { margin-top: var(--fc-space-2); color: var(--fc-text-secondary); font-variant-numeric: tabular-nums; }
+.fc-home__search { flex: 1 1 420px; max-width: 640px; min-height: 36px; padding: 3px 3px 3px var(--fc-space-12); background: var(--fc-surface); }
+.fc-home__search .fc-search__input { font-size: var(--fc-size-body); min-width: 0; }
+.fc-home__search .fc-btn { flex: none; }
+.fc-libnotices { margin-top: var(--fc-space-8); padding: var(--fc-space-6) var(--fc-space-12); border: var(--fc-border-w) solid var(--fc-border-strong); border-radius: var(--fc-radius-2); background: var(--fc-surface-sunken); font-size: var(--fc-size-small); }
+.fc-libnotices p + p { margin-top: var(--fc-space-2); }
+.fc-home__top { align-items: stretch; }
+.fc-home__top > .fc-panel { display: flex; flex-direction: column; min-width: 0; }
+.fc-home__top .fc-panel__body { padding: var(--fc-space-4) var(--fc-space-12) var(--fc-space-8); flex: 1; }
+.fc-home__all { margin-left: auto; font-size: var(--fc-size-small); white-space: nowrap; }
+.fc-home__block { margin-top: var(--fc-space-12); min-width: 0; }
+.fc-home__block > .fc-tablewrap { border: 0; border-radius: 0 0 var(--fc-radius-3) var(--fc-radius-3); }
+.fc-home__block .fc-panel__head .fc-secondary, .fc-home__top .fc-panel__head .fc-secondary { font-size: var(--fc-size-small); }
+.fc-home__calm { display: flex; align-items: center; gap: var(--fc-space-6); padding: var(--fc-space-12) 0; }
+.fc-home__aside { margin-top: var(--fc-space-6); padding-top: var(--fc-space-6); border-top: var(--fc-border-w) solid var(--fc-border); font-size: var(--fc-size-small); }
+.fc-home__aside + .fc-home__aside { border-top: 0; padding-top: 0; margin-top: var(--fc-space-2); }
+.fc-home__empty { margin-top: var(--fc-space-16); max-width: 110ch; gap: var(--fc-space-8); padding: var(--fc-space-16) var(--fc-space-24); }
+.fc-homerows { list-style: none; margin: 0; padding: 0; }
+.fc-homerow { display: flex; align-items: center; gap: var(--fc-space-12); min-height: 44px; padding: var(--fc-space-4) 0; border-bottom: var(--fc-border-w) solid var(--fc-border); font-size: var(--fc-size-table); }
+.fc-homerow:last-child { border-bottom: 0; }
+.fc-homerow__badge { flex: none; width: 122px; }
+.fc-homerow__main { flex: 1; min-width: 0; }
+.fc-homerow__line { display: flex; align-items: baseline; gap: var(--fc-space-8); min-width: 0; }
+.fc-homerow__name { min-width: 0; color: var(--fc-text); }
+.fc-homerow__date { margin-left: auto; flex: none; color: var(--fc-text-secondary); font-size: var(--fc-size-small); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fc-homerow__text { color: var(--fc-text-secondary); font-size: var(--fc-size-small); line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.fc-homerow--latest .fc-homerow__text { display: block; white-space: nowrap; text-overflow: ellipsis; }
+.fc-homerow__spark { flex: none; width: 84px; }
+.fc-homerow__out { flex: none; width: 104px; text-align: right; white-space: nowrap; line-height: 1.25; }
+.fc-homerow__out .fc-cell__sub { display: block; }
+.fc-howto p { max-width: 110ch; }
+.fc-cmd { margin: var(--fc-space-6) 0; padding: var(--fc-space-8) var(--fc-space-12); border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-2); background: var(--fc-surface-sunken); color: var(--fc-text); font-size: var(--fc-size-small); line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fc-cmd:focus-visible { outline: var(--fc-focus-outline); outline-offset: 2px; }
+.fc-tally { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--fc-space-2) var(--fc-space-8); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fc-tally__item { display: inline-flex; align-items: center; gap: 3px; }
+.fc-tally__g { display: inline-block; width: 1.1em; text-align: center; color: var(--fc-text-secondary); }
+.fc-tally__g--incomplete::before { content: var(--fc-glyph-incomplete); }
+.fc-tally__g--running::before { content: var(--fc-glyph-running); font-size: 0.72em; }
+.fc-tile__value--tally { font-size: var(--fc-size-lead); min-height: 28px; display: flex; align-items: center; }
+.fc-projects__name { font-weight: var(--fc-weight-strong); display: inline-flex; max-width: 100%; min-width: 0; }
+.fc-projects th[scope="row"] { max-width: 340px; }
+.fc-projects__where { white-space: normal; }
+.fc-projects__where .fc-chip { margin: 1px var(--fc-space-4) 1px 0; }
+.fc-roots th[scope="row"] { min-width: 220px; }
+.fc-projectspage { padding-top: var(--fc-space-12); }
+.fc-projectpage__top { padding-bottom: 0; }
+.fc-projectpage__runs { margin-top: var(--fc-space-16); margin-bottom: var(--fc-space-6); }
+
+/* ---- the Runs table inside a page (a project): it grows with its rows and the page scrolls ---- */
+.fc-hub--embedded { height: auto; border-top: var(--fc-border-w) solid var(--fc-border-strong); }
+.fc-hub--embedded .fc-hub__main { align-items: flex-start; }
+.fc-hub--embedded .fc-hub__table { overflow-x: auto; overflow-y: visible; }
+.fc-hub--embedded .fc-table--hub th { position: static; }
+.fc-hub--embedded .fc-peek, .fc-hub--embedded .fc-facets { position: sticky; top: var(--fc-appbar-h); max-height: calc(100vh - var(--fc-appbar-h)); }
+.fc-hub--embedded .fc-tray { position: sticky; bottom: 0; }
+.fc-hub__more { padding: var(--fc-space-12); text-align: center; }
+.fc-viewbar__filters { display: none; }
+.fc-table--hub .c-health .fc-cell__sub { overflow: hidden; text-overflow: ellipsis; }
+.fc-table--hub td .fc-cell__sub { display: block; }
+
+/* ---- widths. 1,280 px and wider: the layouts above. 900 to 1,279 px: the same with fewer tiles per row.
+        Under 900 px: one column of the same sections, no rail, controls that do not stick. ---- */
+@media (max-width: 1279px) {
+  .fc-keynumbers .fc-tiles, .fc-section__tiles, .fc-flowcell .fc-keynumbers .fc-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fc-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fc-grid--map, .fc-grid--why { grid-template-columns: minmax(0, 1fr); }
+  .fc-runbody { grid-template-columns: 168px minmax(0, 1fr); }
+  .fc-track { grid-template-columns: 150px minmax(0, 1fr); }
+}
+@media (max-width: 1000px) {
+  /* the peek drawer lies over the table instead of squeezing it */
+  .fc-hub:not(.fc-hub--embedded) .fc-peek, .fc-hub--embedded .fc-peek { position: fixed; top: var(--fc-appbar-h); right: 0; bottom: 0; width: min(var(--fc-drawer-w), 100vw); max-height: none; z-index: calc(var(--fc-z-sticky) + 1); }
+}
+@media (max-width: 899px) {
+  .fc-runbody { grid-template-columns: minmax(0, 1fr); }
+  .fc-runrail { display: none; }
+  .fc-runmain { border-left: 0; }
+  .fc-grid--2, .fc-grid--3, .fc-grid--map, .fc-grid--why, .fc-grid--maps { grid-template-columns: minmax(0, 1fr); }
+  .fc-verdict__parts { grid-template-columns: minmax(0, 1fr); display: grid; }
+  .fc-runcontrols { position: static; }
+  .fc-runhead__actions { margin-left: 0; }
+  .fc-track { grid-template-columns: minmax(0, 1fr); }
+  .fc-track__label { border-right: 0; border-bottom: var(--fc-border-w) solid var(--fc-border); display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--fc-space-2) var(--fc-space-8); }
+  .fc-track__value { margin-top: 0; flex-basis: 100%; }
+  .fc-track:first-child .fc-track__label { border-top-right-radius: var(--fc-radius-3); }
+  .fc-track:last-child .fc-track__label { border-bottom-left-radius: 0; }
+  .fc-readcard__grid { grid-template-columns: minmax(0, 1fr); }
+  .fc-kv th { width: 130px; }
+  /* the filter column gives its width to the table; a button in the view bar opens it over the table */
+  .fc-facets.is-rail { display: none; }
+  .fc-viewbar__filters { display: inline-flex; }
+  .fc-facets:not(.is-rail) { position: fixed; top: var(--fc-appbar-h); left: 0; bottom: 0; z-index: calc(var(--fc-z-sticky) + 1); box-shadow: var(--fc-shadow-3); max-height: none; }
+  .fc-viewbar__count { margin-left: 0; flex-basis: 100%; }
+  .fc-filterbar__notice { margin-left: 0; flex-basis: 100%; }
+  .fc-appbar { gap: var(--fc-space-6); padding: 0 var(--fc-space-8); }
+  .fc-appbar .fc-tab { padding: 0 var(--fc-space-8); }
+  .fc-appbar__search { min-width: 90px; }
+  .fc-home__head { align-items: stretch; }
+  .fc-homerow__spark { display: none; }
+  .fc-projects .c-opt { display: none; }
+  .fc-fcruns__reason { min-width: 160px; }
+}
+@media (max-width: 640px) {
+  .fc-keynumbers .fc-tiles, .fc-section__tiles, .fc-flowcell .fc-keynumbers .fc-tiles, .fc-peek__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fc-appbar__logo svg { height: 18px; }
+  .fc-appbar .fc-tab__n { display: none; }
+  .fc-seg--inverse > * { padding: 0 6px; }
+  .fc-homerow__badge { width: auto; }
+  .fc-homerow__out { display: none; }
+  .fc-homerow__date { display: none; }
+}
+
+/* "Differs from typical" in the Runs table: at its least width the words take the row's two lines instead of
+   being cut (a phrase such as "flow cell, loading and library high" is never ended by an ellipsis) */
+.fc-table--hub td.c-why { white-space: normal; line-height: 1.25; }
+.fc-table--hub td.c-why .fc-why { display: block; white-space: normal; overflow: visible; max-height: 2.6em; }
+
+.fc-projects__row { cursor: pointer; }
+.fc-projects__row:hover > * { background: var(--fc-surface-hover); }
+
+/* ==== Refinements ================================================================== */
+
+/* ---- the Runs table: only the header row sticks. The row header of a run (its flow cell) scrolled under the
+        header row and piled up there, because it was sticky too. ---- */
+.fc-table--hub th { position: static; }
+.fc-hub:not(.fc-hub--embedded) .fc-table--hub thead th { position: sticky; top: 0; z-index: 2; background: var(--fc-surface-sunken); }
+.fc-table--hub thead th { height: auto; min-height: 38px; padding-top: var(--fc-space-4); padding-bottom: var(--fc-space-4); white-space: normal; overflow: hidden; }
+.fc-table--hub thead th > button { max-width: 100%; }
+.fc-table--hub thead th .fc-table__sub { white-space: nowrap; }
+
+/* ---- a focus ring on every control. These three reset everything (all: unset) and lost the ring with it. ---- */
+.fc-table th > button:focus-visible, .fc-filter__x:focus-visible, .fc-close:focus-visible { outline: 2px solid var(--fc-focus); outline-offset: 1px; border-radius: var(--fc-radius-1); }
+.fc-seg > *:focus-visible { outline: 2px solid var(--fc-focus); outline-offset: -3px; border-radius: var(--fc-radius-2); }
+.fc-seg > [aria-checked="true"]:focus-visible { outline-color: var(--fc-surface); box-shadow: inset 0 0 0 1px var(--fc-focus); }
+.fc-surface-inverse .fc-seg > *:focus-visible { outline: 2px solid var(--fc-focus-inverse); outline-offset: -3px; box-shadow: none; }
+.fc-surface-inverse .fc-seg > [aria-checked="true"]:focus-visible { outline-color: var(--fc-surface-inverse); box-shadow: inset 0 0 0 1px var(--fc-focus-inverse); }
+.fc-peek:focus-visible { outline: none; }
+
+/* ---- application bar: its content starts and ends on the gutter lines of the page under it, on every screen; it grows with its text ---- */
+.fc-appbar { height: auto; min-height: 40px; padding: 0; display: block; }
+.fc-appbar__in { display: flex; align-items: center; flex-wrap: nowrap; gap: var(--fc-space-12); min-height: 40px; padding: 0 var(--fc-gutter); }
+.fc-appbar__logo { height: auto; align-self: stretch; }
+.fc-appbar .fc-tabs { align-self: stretch; height: auto; min-height: 40px; }
+.fc-appbar .fc-tab { height: auto; align-self: stretch; }
+.fc-theme1 { display: none; margin-left: auto; flex: none; }
+@media (max-width: 899px) { .fc-appbar__in { gap: var(--fc-space-6); } }
+/* with four tabs, the search box, Compare and three theme buttons the bar is fuller than a narrow window: from 1,000 px down the theme
+   is one button that steps through the three choices, and the search box gives way before anything is pushed out of the window */
+@media (max-width: 1000px) { .fc-theme { display: none; } .fc-theme1 { display: inline-flex; } .fc-appbar__search { flex: 1 1 120px; min-width: 96px; } .fc-appbar__search .fc-search__input { min-width: 40px; } .fc-appbar .fc-tab { padding: 0 var(--fc-space-8); } }
+@media (max-width: 760px) { .fc-appbar__in { flex-wrap: wrap; } .fc-appbar__search { flex-basis: 140px; } .fc-appbar__compare { display: none; } }
+
+/* ---- text size probe (core/state.js textScale): a box 10em wide at 10px; never seen ---- */
+.fc-textprobe { position: absolute; left: -9999px; top: 0; width: 10em; height: 1px; font-size: 10px; visibility: hidden; pointer-events: none; }
+
+/* ---- sizes that hold text follow the text: nothing is cut when the browser shows text larger ---- */
+.fc-tile__value { overflow: visible; white-space: normal; overflow-wrap: anywhere; min-height: 1.2em; }
+.fc-tile.is-unknown .fc-tile__value { line-height: 1.3; min-height: 24px; }
+.fc-homerow__badge { width: auto; min-width: 122px; }
+.fc-homerow__out { width: auto; min-width: 104px; }
+.fc-viewbar__cols { white-space: nowrap; }
+.fc-filterbar__error { color: var(--fc-text); font-size: var(--fc-size-small); }
+.fc-when { white-space: nowrap; }
+time.fc-when[title] { text-decoration: none; cursor: help; }
+.fc-empty__title { font-size: inherit; font-weight: var(--fc-weight-strong); color: var(--fc-text); margin: 0; }
+
+/* ---- peek drawer: three tiles a row, words that wrap instead of being cut ---- */
+.fc-peek__tiles .fc-tile.is-unknown .fc-tile__value { font-size: var(--fc-size-small); line-height: 1.25; white-space: normal; }
+.fc-peek__tiles .fc-tile__label > span:first-child { overflow-wrap: normal; hyphens: none; }
+
+/* ---- all checks: across the whole summary card, as tall as its rows ---- */
+.fc-allchecks { margin-top: var(--fc-space-12); max-height: none; overflow: visible; border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-2); }
+.fc-allchecks__head { display: flex; align-items: baseline; gap: var(--fc-space-8); padding: var(--fc-space-6) var(--fc-space-12); border-bottom: var(--fc-border-w) solid var(--fc-border); background: var(--fc-surface-sunken); font-size: var(--fc-size-table); }
+.fc-allchecks .fc-tablewrap { border-radius: 0 0 var(--fc-radius-2) var(--fc-radius-2); }
+.fc-allchecks__table { table-layout: auto; }
+.fc-allchecks__table th[scope="row"] { min-width: 180px; font-weight: var(--fc-weight-strong); }
+.fc-allchecks__limit { min-width: 300px; }
+.fc-allchecks__from { display: block; margin-top: 1px; color: var(--fc-text-secondary); font-size: var(--fc-size-small); line-height: 1.35; max-width: 100ch; }
+
+/* ---- Home: what still waits, and what the last scan said about single runs ---- */
+.fc-home__progress p + p { margin-top: var(--fc-space-2); }
+.fc-home__progress .fc-mono { color: var(--fc-text); }
+.fc-home__quiet { font-size: var(--fc-size-small); border-top: var(--fc-border-w) solid var(--fc-border); }
+.fc-home__quiet p + p { margin-top: var(--fc-space-4); }
+.fc-home__scanned ul { margin: var(--fc-space-4) 0 var(--fc-space-6); padding-left: var(--fc-space-16); }
+.fc-home__scanned li { margin-top: var(--fc-space-2); }
+/* two charts side by side start their plots at the same height: the reading keeps room for two lines */
+.fc-home .fc-grid--2 > .fc-chart .fc-chart__reading { min-height: calc(2 * var(--fc-lh-body) * 1em); }
+.fc-projects thead th > button, .fc-projects thead th.fc-num > button { width: 100%; }
+.fc-projects thead th.fc-num > button { justify-content: flex-end; }
+.fc-projects thead th.is-on { color: var(--fc-text); }
+/* ---- compare: the time window is a statement, not a control ---- */
+.fc-compare__timetext { font-size: var(--fc-size-small); color: var(--fc-text-secondary); }
+.fc-plot--still { cursor: default; }
+/* ---- charts: the head and the legend wrap instead of pushing the page wider when text is larger ---- */
+.fc-chart__head { flex-wrap: wrap; }
+.fc-chart__title { min-width: 0; overflow-wrap: anywhere; }
+.fc-legend { flex-wrap: wrap; min-width: 0; }
+.fc-legend__item { white-space: normal; min-width: 0; overflow-wrap: anywhere; }
+
+/* ==== Wide windows =================================================================================
+   Under 1,680 px every layout is the one above. From 1,680 px on, what a window adds is used for more columns, not for wider ones: running
+   text keeps its line length, a key number is at most 420 px wide, and a row that does not fill the window starts at the left gutter. A row
+   of charts of a run or analysis page is made by charts/Grid.jsx (.fc-grid--n, further down): columns of one width, at least 420 px and at
+   most 1,200 px, in rows of equal length. Rows that are plain .fc-grid--2 or --3 (Home, Compare) wrap at 420 to 900 px per chart. Timelines
+   and tables of pages keep the whole width: one time axis, and one row per run, read better long. */
+.fc { --fc-chart-min: 420px; --fc-chart-max: 900px; --fc-tile-max: 420px; --fc-table-max: 1500px; }
+@media (min-width: 1680px) {
+  /* chart rows: as many side by side as fit at the least width, each as wide as the row allows up to the most */
+  .fc-grid--2, .fc-grid--3 { display: flex; flex-wrap: wrap; }
+  .fc-grid--2 > *, .fc-grid--3 > * { flex: 1 1 var(--fc-chart-min); min-width: 0; max-width: var(--fc-chart-max); }
+  /* a chart that stands alone in its section is no wider than one in a row */
+  .fc-section > .fc-chart { max-width: var(--fc-chart-max); }
+  /* the flow cell map and the chart beside it: the map as wide as it is drawn (--fc-plot-max, set by the chart), the bars at most 640 px */
+  .fc-grid--map { display: flex; }
+  .fc-grid--map > * { flex: 2.3 1 0; min-width: 0; }
+  .fc-grid--map > .fc-chart--map { max-width: calc(var(--fc-plot-max, 100vw) + 2 * var(--fc-space-12) + 2 * var(--fc-border-w)); }
+  .fc-grid--map > .fc-chart--side { flex: 1 1 0; min-width: 280px; max-width: 640px; }
+  /* key numbers: six across, none wider than a number needs; the tiles of a section are six across the whole section, so
+     that a row of tiles ends where the rows of charts under it end */
+  .fc-keynumbers .fc-tiles, .fc-flowcell .fc-keynumbers .fc-tiles { grid-template-columns: repeat(6, minmax(0, var(--fc-tile-max))); }
+  .fc-section__tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  /* the two parts of a verdict */
+  .fc-verdict__parts { display: flex; flex-wrap: wrap; }
+  .fc-verdict__part { flex: 1 1 280px; min-width: 0; max-width: 960px; }
+  /* running text keeps a line length that can be read, whatever it sits in (a rule of its own on an element wins over this one) */
+  :where(.fc-page) :where(p:not([class]), .fc-notice, .fc-empty > span, li, dd, .fc-chart__note, .fc-chart__foot > .fc-muted) { max-width: 130ch; }
+  /* Tables of a page (Runs, Projects, Analyses, the samples of a run) are as wide as the page: one rule for all of them, so no page of
+     tables ends short of another. Only a table inside a drawer and an empty-state box keep a width that reads as one block. */
+  .fc-disclosure__body > .fc-tablewrap, .fc-section > .fc-empty { max-width: var(--fc-table-max); }
+  .fc-disclosure__body > .fc-allnumbers { max-width: 900px; }
+  /* one map per run: a panel is as wide as its map is drawn */
+  .fc-grid--maps > .fc-chart { max-width: var(--fc-plot-max, none); }
+  /* the label column of a timeline has room for its words */
+  .fc-track { grid-template-columns: 208px minmax(0, 1fr); }
+  /* Home: the charts of Activity fill their row like the tables above them */
+  .fc-home .fc-grid--2 > * { max-width: none; }
+  /* Compare: the table of factors beside the output, in the proportion of the narrower layout until both have their most */
+  .fc-grid--why { display: flex; }
+  .fc-grid--why > .fc-panel { flex: 1.5 1 0; min-width: 0; max-width: 1200px; }
+  .fc-grid--why > .fc-chart { flex: 1 1 0; min-width: 0; max-width: var(--fc-chart-max); }
+  .fc-compare > .fc-panel { max-width: calc(1200px + var(--fc-space-12) + var(--fc-chart-max)); }
+  /* Compare: the charts under the tables are one row of up to four */
+  .fc-compare__charts { display: flex; flex-wrap: wrap; gap: var(--fc-space-12); margin-top: var(--fc-space-12); align-items: flex-start; }
+  .fc-compare__charts > .fc-grid { display: contents; }
+  .fc-compare__charts > .fc-grid > * { flex: 1 1 var(--fc-chart-min); min-width: 0; max-width: var(--fc-chart-max); }
+}
+/* A row of charts made by charts/Grid.jsx (.fc-grid--n). The component states, for every number of charts that could fit side by side
+   (--fc-k1 to --fc-k8), how many columns give rows of equal length; the width of the window picks one of them here. The thresholds are the
+   widths at which k charts of 420 px fit beside the rail of a run or analysis page (432 px per column and its gap, 235 px of rail, gutters
+   and section padding). A column is at most --fc-chart-wide; a chart left over in the last row keeps the width of the others; rows start
+   at the left. */
+.fc { --fc-chart-wide: 1200px; }
+@media (min-width: 1680px) {
+  .fc-grid--n { display: grid; --fc-k: var(--fc-k3, 2); grid-template-columns: repeat(var(--fc-k), minmax(0, var(--fc-chart-wide))); justify-content: start; }
+  .fc-grid--n > * { max-width: none; min-width: 0; }
+}
+@media (min-width: 1963px) { .fc-grid--n { --fc-k: var(--fc-k4, 2); } }
+@media (min-width: 2395px) { .fc-grid--n { --fc-k: var(--fc-k5, 2); } }
+@media (min-width: 2827px) { .fc-grid--n { --fc-k: var(--fc-k6, 2); } }
+@media (min-width: 3259px) { .fc-grid--n { --fc-k: var(--fc-k7, 2); } }
+@media (min-width: 3691px) { .fc-grid--n { --fc-k: var(--fc-k8, 2); } }
+@media (min-width: 2200px) {
+  /* Home on a wide window: what needs attention and the latest runs beside the activity of the library, the projects beside the folders */
+  .fc-home { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--fc-space-12); align-items: start; }
+  .fc-home > * { grid-column: 1 / -1; }
+  .fc-home > .fc-home__top { grid-column: 1 / span 8; grid-row: 3; align-self: stretch; }
+  .fc-home > .fc-home__block--activity { grid-column: 9 / -1; grid-row: 3; }
+  .fc-home > .fc-home__block--projects { grid-column: 1 / span 7; grid-row: 4; }
+  .fc-home > .fc-home__block--roots { grid-column: 8 / -1; grid-row: 4; }
+  .fc-home > .fc-home__head { grid-row: 1; }
+  .fc-home > .fc-home__notices { grid-row: 2; }
+}
+@media (min-width: 2400px) {
+  /* Compare: the output over time stands beside the two tables, which are read one under the other */
+  .fc-compare { display: grid; grid-template-columns: minmax(0, 1200px) minmax(var(--fc-chart-min), var(--fc-chart-max)) minmax(0, 1fr); column-gap: var(--fc-space-12); align-items: start; }
+  .fc-compare > * { grid-column: 1 / -1; min-width: 0; }
+  .fc-compare > .fc-grid--why { display: contents; }
+  .fc-compare > .fc-grid--why > .fc-panel, .fc-compare > .fc-panel { grid-column: 1; max-width: none; margin-top: var(--fc-space-12); }
+  .fc-compare > .fc-grid--why > .fc-chart { grid-column: 2; grid-row: span 2; max-width: none; margin-top: var(--fc-space-12); }
+  /* a run: the six key numbers stand beside the verdict, three by two (.fc-runtop holds the two; a run without key numbers keeps the whole row) */
+  .fc-runtop { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, calc(3 * var(--fc-tile-max) + 2 * var(--fc-space-8))); column-gap: var(--fc-space-12); align-items: start; }
+  .fc-runtop > * { min-width: 0; }
+  .fc-runtop > :only-child { grid-column: 1 / -1; }
+  .fc-runtop > .fc-keynumbers { margin-top: 0; }
+  .fc-runtop > .fc-keynumbers .fc-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 3000px) {
+  .fc-home > .fc-home__top { grid-column: 1 / span 6; }
+  .fc-home > .fc-home__block--activity { grid-column: 7 / -1; }
+  .fc-home > .fc-home__block--projects { grid-column: 1 / span 6; }
+  .fc-home > .fc-home__block--roots { grid-column: 7 / -1; }
+}
+
+/* ==== Single-cell and spatial analyses =============================================================
+   The analysis page has the skeleton of the run page and uses its classes; what is here is the spatial map (its own canvas component), the chips
+   of the runs an analysis came from, the card of an analysis on a run page, and the Analyses table. Read-outs keep a fixed height: a pointer
+   over the map changes text inside its box and nothing else. */
+.fc-spmap__body { display: flex; align-items: flex-start; gap: var(--fc-space-16); flex-wrap: wrap; }
+.fc-spmap__main { flex: 1 1 320px; min-width: 0; max-width: 620px; }
+.fc-spmap__side { flex: 0 1 240px; min-width: 200px; display: flex; flex-direction: column; gap: var(--fc-space-8); }
+/* A wide screen: a second picture of the same slide beside the first (another colouring, the same cursor), and both as
+   large as the height of the window lets a whole picture be seen. Below that width there is one picture with its switch. */
+.fc-spmap__second { display: none; }
+.fc-spmap__beside { align-items: center; }
+.fc-spmap__beside label { display: inline-flex; align-items: center; gap: var(--fc-space-6); }
+@media (min-width: 1800px) {
+  .fc-section > .fc-chart.fc-spmap--two { max-width: calc(2 * 860px + 240px + 4 * var(--fc-space-16)); }
+  .fc-spmap--two .fc-spmap__body { flex-wrap: nowrap; }
+  .fc-spmap--two .fc-spmap__main { flex: 1 1 420px; max-width: max(420px, min(860px, calc(100vh - 330px))); }
+  .fc-spmap--two .fc-spmap__second { display: block; }
+  .fc-spmap--two .fc-spmap__side { order: 3; flex: 0 0 240px; }
+}
+.fc-spmap__plot { position: relative; width: 100%; background: var(--fc-chart-surface); border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-2); overflow: hidden; touch-action: none; }
+.fc-spmap__plot:focus-visible { outline: 2px solid var(--fc-focus, var(--fc-accent)); outline-offset: 2px; }
+.fc-spmap__plot--still { border: 0; background: transparent; }
+.fc-spmap__cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.fc-spmap__over { cursor: crosshair; }
+.fc-spmap__pick { display: flex; flex-direction: column; gap: var(--fc-space-2); }
+.fc-spmap__pick > .fc-caps { margin-bottom: var(--fc-space-2); }
+.fc-spmap__opt { all: unset; box-sizing: border-box; cursor: pointer; padding: var(--fc-space-4) var(--fc-space-8); border: var(--fc-border-w) solid var(--fc-border-control); border-radius: var(--fc-radius-2); background: var(--fc-surface); color: var(--fc-text);
+  font: var(--fc-size-small)/1.3 var(--fc-font-sans); }
+.fc-spmap__opt:hover { background: var(--fc-surface-sunken); }
+.fc-spmap__opt:focus-visible { outline: 2px solid var(--fc-focus, var(--fc-accent)); outline-offset: 1px; }
+.fc-spmap__opt.is-on { background: var(--fc-text); color: var(--fc-surface); border-color: var(--fc-text); font-weight: var(--fc-weight-strong); }
+.fc-spmap__check { display: inline-flex; align-items: center; gap: var(--fc-space-6); font-size: var(--fc-size-small); cursor: pointer; }
+.fc-spmap__box { display: flex; flex-direction: column; gap: var(--fc-space-2); padding: var(--fc-space-8); border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-2); font-size: var(--fc-size-small); color: var(--fc-text-secondary); }
+.fc-spmap__box > b { color: var(--fc-text); }
+.fc-spmap__box > .fc-tag { align-self: flex-start; }
+.fc-spmap__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fc-spmap .fc-chart__foot { min-height: 22px; }
+.fc-fromreport { text-transform: none; letter-spacing: 0; font-weight: var(--fc-weight-normal, 400); white-space: nowrap; }
+.fc-tile__label .fc-fromreport { margin-left: var(--fc-space-4); }
+/* the runs an analysis came from */
+.fc-runchips { display: inline-flex; flex-wrap: wrap; gap: var(--fc-space-4) var(--fc-space-6); vertical-align: middle; }
+.fc-runchip { display: inline-flex; align-items: center; gap: var(--fc-space-6); padding: 1px var(--fc-space-8); border: var(--fc-border-w) solid var(--fc-border-control); border-radius: var(--fc-radius-2); background: var(--fc-surface); color: var(--fc-text);
+  font-size: var(--fc-size-small); text-decoration: none; white-space: nowrap; }
+a.fc-runchip:hover { background: var(--fc-surface-sunken); }
+.fc-runchip.is-missing { border-style: dashed; color: var(--fc-text-muted); background: transparent; }
+.fc-anruns { display: flex; align-items: center; flex-wrap: wrap; gap: var(--fc-space-4) var(--fc-space-8); }
+.fc-ancontrols { align-items: center; }
+.fc-ancontrols__note { font-size: var(--fc-size-small); color: var(--fc-text-secondary); }
+.fc-anverdict .fc-reasons__go { margin-left: auto; white-space: nowrap; font-size: var(--fc-size-small); }
+.fc-anverdict .fc-allchecks__wrap { margin-top: var(--fc-space-8); }
+.fc-anparams { margin-top: var(--fc-space-12); max-width: 900px; }
+.fc-analysis .fc-section > .fc-tablewrap { margin-top: var(--fc-space-12); }
+/* the Analyses table */
+.fc-analyses__kind { font-weight: var(--fc-weight-strong); min-width: 30px; text-align: center; }
+.fc-analyses td span.fc-analyses__why { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-width: 26ch; max-width: 64ch; overflow: hidden; white-space: normal; }
+.fc-analyses td:last-child { white-space: normal; min-width: 150px; }
+.fc-analyses .fc-runchips { display: flex; }
+@media (max-width: 1500px) { .fc-analyses .c-opt { display: none; } }
+.fc-analyses__flags { display: flex; flex-wrap: wrap; gap: var(--fc-space-4); margin-top: var(--fc-space-2); }
+.fc-analyses td .fc-table__sub, .fc-analyses th .fc-table__sub { display: block; }
+.fc-analyses .fc-badge { vertical-align: middle; }
+/* the card of an analysis on a run page */
+.fc-ancard { display: flex; align-items: flex-start; gap: var(--fc-space-16); margin-top: var(--fc-space-12); padding: var(--fc-space-12); border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-3); background: var(--fc-surface); flex-wrap: wrap; }
+.fc-ancard__main { flex: 1 1 420px; min-width: 0; }
+.fc-ancard__head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--fc-space-4) var(--fc-space-8); }
+.fc-ancard__name { font-weight: var(--fc-weight-strong); font-size: var(--fc-size-body-lg, 15px); min-width: 0; display: inline-flex; }
+.fc-ancard__why { font-size: var(--fc-size-small); color: var(--fc-text-secondary); flex: 1 1 240px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-ancard__share { margin: var(--fc-space-6) 0 var(--fc-space-8); font-size: var(--fc-size-table); }
+.fc-ancard__tiles { grid-template-columns: repeat(4, minmax(0, var(--fc-tile-max))); }
+.fc-ancard__open { align-self: center; white-space: nowrap; }
+.fc-anthumb { flex: 0 0 120px; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; border: var(--fc-border-w) solid var(--fc-border); border-radius: var(--fc-radius-2); background: var(--fc-chart-surface); overflow: hidden; }
+.fc-anthumb > .fc-spmap__plot { width: 100%; max-height: 100%; }
+.fc-anthumb--none { color: var(--fc-text-muted); font-size: var(--fc-size-caption); }
+@media (max-width: 760px) { .fc-ancard__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fc-spmap__side { flex-basis: 100%; } }
+@media (min-width: 1680px) { .fc-analysespage > .fc-home__block { max-width: none; } .fc-ancard { max-width: calc(2 * var(--fc-chart-max)); }
+  /* Home is a grid with stated rows on a wide screen: the analyses come after the runs, the projects and the folders */
+  .fc-home > .fc-home__block--analyses { grid-row: 5; } }
+
+/* ---- notices a section must say, and small layout rules ---- */
+/* a count that covers two flow cells, a source that is not the primary version: said as strongly as "partial" */
+.fc-shared, .fc-variant { font-weight: var(--fc-weight-strong); color: var(--fc-text); }
+.fc-waiting .fc-mono { font-weight: var(--fc-weight-normal, 400); }
+/* the name of a sample as the title of a track: all of it, on as many lines as it needs */
+.fc-track__title { overflow-wrap: anywhere; }
+.fc-home__anlook { margin: 0; padding: var(--fc-space-6) var(--fc-space-12) var(--fc-space-8); font-size: var(--fc-size-small); }
+.fc-hub__anhint { display: block; margin-top: var(--fc-space-6); }
+.fc-ancontrols__verdicts { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--fc-space-4) var(--fc-space-12); font-size: var(--fc-size-small); }
+.fc-ancontrols__v { display: inline-flex; align-items: center; gap: var(--fc-space-6); white-space: nowrap; }
+
+/* ==== Paper =========================================================================================
+   A page is saved as a PDF through the print dialog of the browser. While it is on its way there, <html> carries the class "fc-print"
+   and the theme "print" (core/print.js sets both when the browser says `beforeprint` and takes them away at `afterprint`). Every rule of
+   the paper layout hangs on that class and not on `@media print`: the page is laid out for paper while it is still on screen, so each
+   chart is measured, and painted again, at the width it has on the sheet. The width is fixed (--fc-paper-w: the text area of an A4 sheet
+   with the margins below; a Letter sheet is a little wider and shorter), so the sheets are the same on both, apart from where they end.
+   Rules that depend on the width of the window are stated again here, because the window is wide while the paper is narrow. */
+@page { margin: 10mm; }
+.fc { --fc-paper-w: 714px; }
+.fc-savepdf { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--fc-space-2) var(--fc-space-4); }
+.fc-items__actions { margin-left: auto; display: inline-flex; align-items: center; }
+
+html.fc-print { background: var(--fc-page); }
+html.fc-print body.fc { min-height: 0; overflow: visible; --fc-gutter: 0px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+html.fc-print #app { width: var(--fc-paper-w); margin: 0 auto; }
+html.fc-print .fc-page { padding: 0; }
+html.fc-print #main { outline: 0; }
+/* no navigation, no controls, no read-out of a pointer: what is left is what the page says */
+html.fc-print :is(.fc-appbar, .fc-skip, .fc-crumbs, .fc-rail, .fc-controls, .fc-ctrl, .fc-sentinel, .fc-tray, .fc-facets, .fc-peek, .fc-btn, .fc-linkbtn:not(.fc-samples .fc-linkbtn), .fc-close, .fc-chart__menu,
+  .fc-track__menu, .fc-chart__readout, .fc-track__value, .fc-tip, .fck-over, .fc-spmap__over, .fc-runhead__actions, .fc-items__actions, .fc-section__tools, .fc-reasons__go, .fc-evidence[role="status"],
+  .fc-screen, .fc-spmap__pick, .fc-spmap__check, .fc-spmap__second, .fc-disclosure:not(.is-open), .fc-textprobe, .fc-search, select, input) { display: none !important; }
+/* the other screens (Home, Runs, Projects) have no layout of their own for paper: they are printed as they are, at the width of the sheet */
+html.fc-print .fc-hub { height: auto; }
+html.fc-print .fc-samples .fc-linkbtn { color: inherit; text-decoration: none; cursor: default; }
+html.fc-print :is(.fc-section, .fc-chart, .fc-track).is-evidence { outline: 0; }
+html.fc-print a { color: inherit; text-decoration: none; }
+html.fc-print .fc-tile, html.fc-print .fc-plot { cursor: default; }
+/* an open group is a small heading, not a button */
+html.fc-print .fc-disclosure.is-open { display: block; min-height: 0; margin-top: var(--fc-space-12); border: 0; background: none; padding-left: 0; padding-right: 0; padding-top: 0; font-weight: var(--fc-weight-strong); font-size: var(--fc-size-table); }
+html.fc-print .fc-disclosure.is-open::before { display: none; }
+
+/* ---- the strip at the head of the first sheet, and the selection the sheets show ---- */
+.fc-paper__head { display: flex; align-items: flex-end; gap: var(--fc-space-16); padding: 0 0 var(--fc-space-6); border-bottom: 2px solid var(--fc-text); }
+.fc-paper__logo { flex: none; display: block; height: 26px; width: auto; }
+.fc-paper__what { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-end; text-align: right; gap: 1px; }
+.fc-paper__kind { font-size: var(--fc-size-lead); line-height: var(--fc-lh-tight); }
+.fc-paper__made { font-size: var(--fc-size-caption); line-height: var(--fc-lh-dense); color: var(--fc-text-secondary); }
+.fc-paper__scope { margin-top: var(--fc-space-12); padding: var(--fc-space-6) var(--fc-space-12); border: var(--fc-border-w) solid var(--fc-border-strong); border-radius: var(--fc-radius-2); font-size: var(--fc-size-small); line-height: var(--fc-lh-body); break-inside: avoid; }
+.fc-paper__item { white-space: normal; }
+.fc-paper__left { color: var(--fc-text-secondary); }
+
+/* ---- the layouts of the screen at the width of the paper ---- */
+html.fc-print .fc-runtop { display: block; }
+html.fc-print .fc-runtop > .fc-keynumbers { margin-top: var(--fc-space-12); }
+html.fc-print .fc-runbody { display: block; }
+html.fc-print .fc-runmain { border-left: 0; margin-top: var(--fc-space-12); }
+html.fc-print .fc-runhead { padding-top: var(--fc-space-8); }
+html.fc-print .fc-runhead__name, html.fc-print .fc-item { max-width: none; }
+html.fc-print .fc-trunc-mid { display: inline; white-space: normal; overflow-wrap: anywhere; }
+html.fc-print .fc-trunc-mid > * { overflow: visible; }
+html.fc-print .fc-verdict__parts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html.fc-print .fc-verdict__part { max-width: none; }
+html.fc-print :is(.fc-keynumbers .fc-tiles, .fc-section__tiles, .fc-flowcell .fc-keynumbers .fc-tiles, .fc-ancard__tiles) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html.fc-print .fc-spmap__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* the rule over a section belongs to its heading on paper: Firefox would leave the rule of a section at the foot of a sheet and begin the section on the next */
+html.fc-print .fc-section { padding-left: 0; padding-right: 0; padding-top: 0; border-top: 0; }
+html.fc-print .fc-section > .fc-section__head { padding-top: var(--fc-space-16); border-top: var(--fc-border-w) solid var(--fc-border-strong); }
+/* A row of charts is two across. It is laid out as lines of blocks that may not be cut, not as a grid: browsers end a sheet between two lines
+   in the same way everywhere, while a grid that follows a block which moved to the next sheet is moved a whole sheet further by Chromium. */
+html.fc-print .fc-grid, html.fc-print .fc-compare__charts { display: block; font-size: 0; orphans: 1; widows: 1; }
+html.fc-print .fc-grid > * { display: block; width: auto; min-width: 0; max-width: none; margin-top: var(--fc-space-12); font-size: var(--fc-size-body); }
+html.fc-print .fc-grid > :first-child { margin-top: 0; }
+html.fc-print :is(.fc-grid--2, .fc-grid--3, .fc-grid--n) > * { display: inline-block; vertical-align: top; width: calc(50% - var(--fc-space-6)); }
+html.fc-print :is(.fc-grid--2, .fc-grid--3, .fc-grid--n) > :nth-child(odd) { margin-right: var(--fc-space-12); }
+html.fc-print :is(.fc-grid--2, .fc-grid--3, .fc-grid--n) > :nth-child(2) { margin-top: 0; }
+/* the ring of the alignment records names its parts beside it and needs the whole width for that; its table follows it at the same width */
+html.fc-print .fc-grid > :is(#p-aln-records, #p-aln-records-table) { display: block; width: auto; margin-right: 0; }
+html.fc-print .fc-grid > #p-aln-records-table { margin-top: var(--fc-space-12); }
+html.fc-print .fc-section > :is(.fc-chart, .fc-empty), html.fc-print .fc-disclosure__body > :is(.fc-tablewrap, .fc-allnumbers), html.fc-print .fc-ancard, html.fc-print .fc-anparams { max-width: none; }
+html.fc-print .fc-compare, html.fc-print .fc-home { display: block; }
+html.fc-print .fc-compare > .fc-panel { max-width: none; margin-top: var(--fc-space-12); }
+/* Compare: its three charts and the read lengths are one row of charts, two across (the second group holds one chart, the fourth of the row) */
+html.fc-print .fc-compare__charts { margin-top: 0; }
+html.fc-print .fc-compare__charts > .fc-grid { display: contents; }
+html.fc-print .fc-compare__charts > .fc-grid > * { margin-top: var(--fc-space-12); }
+html.fc-print .fc-compare__charts > .fc-grid--2 > :first-child { margin-right: 0; }
+html.fc-print .fc-items { padding-bottom: var(--fc-space-4); }
+html.fc-print .fc-compare__notices { margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; border-top: 0; background: none; }
+/* a timeline: the label beside its plot, as on a wide screen */
+html.fc-print .fc-track { grid-template-columns: 150px minmax(0, 1fr); }
+html.fc-print .fc-track__label { display: block; border-right: var(--fc-border-w) solid var(--fc-border); border-bottom: 0; }
+html.fc-print .fc-readcard__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html.fc-print .fc-kv th { width: 170px; }
+/* the spatial map: one picture, what stands beside it under it */
+html.fc-print .fc-spmap__body { flex-wrap: wrap; }
+html.fc-print .fc-spmap__main { flex: 1 1 320px; max-width: 460px; }
+html.fc-print .fc-spmap__side { order: 0; flex: 1 1 200px; min-width: 200px; }
+
+/* ---- tables: every column on the sheet, every row ---- */
+html.fc-print :is(.fc-tablewrap, .fc-charttable, .fc-allchecks, .fc-hub__table) { overflow: visible; max-height: none; }
+html.fc-print .fc-table td, html.fc-print .fc-table th { white-space: normal; height: auto; overflow-wrap: break-word; }
+html.fc-print .fc-table td:is(.fc-nowrap, .fc-num) { white-space: nowrap; overflow-wrap: normal; }
+html.fc-print .fc-table tbody tr:hover td { background: transparent; }
+html.fc-print :is(.fc-allchecks__limit, .fc-fcruns__reason, .fc-why-table td:last-child, .fc-allchecks__table th[scope="row"]) { min-width: 0; }
+html.fc-print .fc-samples__name { max-width: none; display: inline; }
+html.fc-print .fc-samples .fc-cellbar { max-width: 44px; }
+html.fc-print :is(.fc-samples, .fc-fcruns) { font-size: var(--fc-size-small); }
+html.fc-print .fc-table :is(td, th) { padding-left: var(--fc-space-4); padding-right: var(--fc-space-4); }
+.fc-fcruns__reasons { list-style: none; margin-top: var(--fc-space-8); font-size: var(--fc-size-small); color: var(--fc-text-secondary); }
+.fc-fcruns__reasons li + li { margin-top: var(--fc-space-2); }
+.fc-fcruns__reasons b { color: var(--fc-text); font-weight: var(--fc-weight-strong); }
+html.fc-print .fc-ancard__why { white-space: normal; overflow: visible; }
+/* the page of a project on paper is a report of the project (projects/Projects.jsx): its own table of runs stands for the Runs table of the screen */
+html.fc-print .fc-projectpage :is(.fc-hub, .fc-projectpage__where, .fc-projectpage__runs) { display: none !important; }
+html.fc-print .fc-runhead__line { max-width: none; }
+html.fc-print .fc-paperruns { font-size: var(--fc-size-small); }
+html.fc-print .fc-paperruns .fc-cellbar { max-width: 44px; }
+html.fc-print .fc-paperproject + .fc-paperproject { margin-top: var(--fc-space-16); }
+
+/* ---- where a sheet may end: never inside a chart, a row of tiles or a row of a table; a heading stays with the block under it
+        (it is made as tall as itself and that block, --fc-keep, measured in core/print.js: a tall block that may not be cut) ---- */
+html.fc-print :is(.fc-chart, .fc-tiles, .fc-tile, .fc-track, .fc-verdict__head, .fc-verdict__part, .fc-empty, .fc-ancard, .fc-item, .fc-paper__head, .fc-keynumbers, .fc-readcard, .fc-legend, .fc-chart__foot,
+  .fc-spmap__box, .fc-runhead, .fc-runstrip, .fc-libnotices, .fc-banner, .fc-section__note, .fc-verdict__note, tr, li, thead) { break-inside: avoid; }
+html.fc-print :is(.fc-section__head, .fc-panel__head, .fc-disclosure.is-open, .fc-allchecks__head, .fc-section__reading, thead) { break-after: avoid; }
+/* the heading is a block that may not be cut and that ends in an empty box as tall as the block under it; the box takes its height back with a
+   margin, so the block under the heading stands where it stood (a padding on the heading itself is not held together by Firefox) */
+html.fc-print :is(.fc-section__head, .fc-panel__head, .fc-disclosure.is-open, .fc-allchecks__head) { display: block; break-inside: avoid; padding-bottom: 0; }
+html.fc-print :is(.fc-section__head, .fc-panel__head, .fc-disclosure.is-open, .fc-allchecks__head)::after { content: ""; display: block; height: var(--fc-keep, 0px); margin-bottom: calc(-1 * var(--fc-keep, 0px)); break-inside: avoid; }
+html.fc-print :is(.fc-section__head, .fc-panel__head, .fc-allchecks__head) > * { display: inline-block; vertical-align: baseline; margin-right: var(--fc-space-8); }
+html.fc-print .fc-section__head > .fc-badge { display: inline-flex; vertical-align: 2px; }
+html.fc-print :is(.fc-panel__head, .fc-allchecks__head) { border-bottom: 0; background: none; }
+html.fc-print :is(.fc-panel__head, .fc-allchecks__head) + * { margin-top: var(--fc-space-8); border-top: var(--fc-border-w) solid var(--fc-border); }
+/* a box that a sheet ends in is closed at the foot of that sheet and opened again at the head of the next */
+html.fc-print :is(.fc-verdict, .fc-panel, .fc-allchecks, .fc-paper__scope) { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+/* a timeline: every track is a box of its own, so no frame is left open where a sheet ends between two tracks */
+html.fc-print .fc-tracks { border: 0; background: none; border-radius: 0; }
+html.fc-print .fc-track { border: var(--fc-border-w) solid var(--fc-border); background: var(--fc-chart-surface); }
+html.fc-print .fc-track + .fc-track { margin-top: calc(-1 * var(--fc-border-w)); }
+html.fc-print .fc-track__label, html.fc-print .fc-track:first-child .fc-track__label, html.fc-print .fc-track:last-child .fc-track__label { border-radius: 0; }
+html.fc-print .fc-verdict, html.fc-print .fc-panel, html.fc-print .fc-tracks { box-shadow: none; }
+
+/* a page printed by a browser that did not say `beforeprint` (none of the supported ones): at least without the bars */
+@media print {
+  body.fc { min-height: 0; overflow: visible; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .fc-savepdf, .fc-skip, .fc-crumbs, .fc-chart__readout, .fc-track__value, .fck-over, .fc-spmap__over, .fc-runhead__actions, .fc-items__actions { display: none !important; }
+}

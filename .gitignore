@@ -1,0 +1,22 @@
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# private working folders: never in the repository
+local/
+# the built viewer is made by the build, not kept in git
+src/flowcellar/viewer_dist/
+pw-browsers/
+.cache/
+viewer/src/gen/
+
+# design documents and the prototype quote real run, project and sample names:
+# keep them out of git until they have been scrubbed
+design/
+prototype/

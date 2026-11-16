@@ -1,0 +1,22 @@
+{
+  "name": "flowcellar-viewer",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The FlowCellar viewer: Preact, signals and the project's own canvas chart kit, built into one classic script and one stylesheet that the Python package ships.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:dev": "node build.mjs --dev",
+    "verify": "node verify/fixture.mjs",
+    "verify:quick": "node verify/fixture.mjs --quick",
+    "test:query": "node verify/query_vectors.mjs"
+  },
+  "dependencies": {
+    "@preact/signals": "2.11.4",
+    "preact": "11.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "playwright": "1.65.0"
+  }
+}

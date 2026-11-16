@@ -1,0 +1,479 @@
+{
+ "name": "projects by exact name, verdict values that are checked, runs that count and runs that are cut off",
+ "function": "query.filter",
+ "args": {
+  "rows": [
+   {
+    "id": "TST00101_11111111",
+    "fc": "TST00101",
+    "started": "2026-01-05T09:00:00Z",
+    "hours": 96.0,
+    "run_state": "finished",
+    "verdict": "warn",
+    "health": "warn",
+    "data": "pass",
+    "kit": "SQK-PCB114-24",
+    "product": "FLO-PRO114M",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-A",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "6.10.12",
+    "experiment": "series",
+    "run_name": "pool 1",
+    "folder": "20260101_0900_P2S-00000-A_TST00101_11111111",
+    "project": "alpha",
+    "project_ids": [
+     "alpha"
+    ],
+    "roots": [
+     "minknow",
+     "store"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "full",
+    "cause": null,
+    "modifiers": [],
+    "reads": 76400000,
+    "gb": 186.2,
+    "gb_24h": 67.9,
+    "gb_48h": 128.7,
+    "gb_72h": 183.2,
+    "pores": 8203,
+    "occ_first": 0.963,
+    "n50_est": 3128,
+    "read_data": "complete",
+    "t2_passed_gb": 119.7,
+    "t2_n50": 2752,
+    "t2_q_med": 21.94,
+    "t2_usable": 0.677,
+    "t2_samples": 6,
+    "samples": [],
+    "reason_checks": [],
+    "pending": 0,
+    "headline": "The flow cell ran well."
+   },
+   {
+    "id": "TST00102_22222222",
+    "fc": "TST00102",
+    "started": "2026-02-05T09:00:00Z",
+    "hours": 96.0,
+    "run_state": "finished",
+    "verdict": "pass",
+    "health": "pass",
+    "data": "not_available",
+    "kit": "SQK-PCB114-24",
+    "product": "FLO-PRO114M",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-A",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "6.10.12",
+    "experiment": "series",
+    "run_name": "pool 2",
+    "folder": "20260201_0900_P2S-00000-A_TST00102_22222222",
+    "project": "alpha_repeat",
+    "project_ids": [
+     "alpha_repeat"
+    ],
+    "roots": [
+     "minknow",
+     "store"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "full",
+    "cause": null,
+    "modifiers": [],
+    "reads": 76400000,
+    "gb": 186.2,
+    "gb_24h": 67.9,
+    "gb_48h": 128.7,
+    "gb_72h": 183.2,
+    "pores": 8203,
+    "occ_first": 0.963,
+    "n50_est": 3128,
+    "read_data": "complete",
+    "t2_passed_gb": 119.7,
+    "t2_n50": 2752,
+    "t2_q_med": 21.94,
+    "t2_usable": 0.677,
+    "t2_samples": 6,
+    "samples": [],
+    "reason_checks": [],
+    "pending": 0,
+    "headline": "The flow cell ran well."
+   },
+   {
+    "id": "TST00103_33333333",
+    "fc": "TST00103",
+    "started": "2026-03-05T09:00:00Z",
+    "hours": 96.0,
+    "run_state": "finished",
+    "verdict": "pass",
+    "health": "pass",
+    "data": "pass",
+    "kit": "SQK-PCB114-24",
+    "product": "FLO-PRO114M",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-A",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "6.10.12",
+    "experiment": "series",
+    "run_name": "pool 3",
+    "folder": "20260301_0900_P2S-00000-A_TST00103_33333333",
+    "project": "alpha",
+    "project_ids": [
+     "alpha",
+     "beta"
+    ],
+    "roots": [
+     "minknow",
+     "store"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "full",
+    "cause": null,
+    "modifiers": [],
+    "reads": 76400000,
+    "gb": 186.2,
+    "gb_24h": 67.9,
+    "gb_48h": 128.7,
+    "gb_72h": 183.2,
+    "pores": 8203,
+    "occ_first": 0.963,
+    "n50_est": 3128,
+    "read_data": "complete",
+    "t2_passed_gb": 119.7,
+    "t2_n50": 2752,
+    "t2_q_med": 21.94,
+    "t2_usable": 0.677,
+    "t2_samples": 6,
+    "samples": [],
+    "reason_checks": [],
+    "pending": 0,
+    "headline": "The flow cell ran well.",
+    "t2_files_waiting": 3
+   },
+   {
+    "id": "TST00104_44444444",
+    "fc": "TST00104",
+    "started": "2026-04-05T09:00:00Z",
+    "hours": 96.0,
+    "run_state": "finished",
+    "verdict": "incomplete",
+    "health": "incomplete",
+    "data": "unknown",
+    "kit": "SQK-PCB114-24",
+    "product": "FLO-PRO114M",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-A",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "6.10.12",
+    "experiment": "series",
+    "run_name": "pool 4",
+    "folder": "20260401_0900_P2S-00000-A_TST00104_44444444",
+    "project": "Beta Two",
+    "project_ids": [
+     "beta_two"
+    ],
+    "roots": [
+     "minknow",
+     "store"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "quick",
+    "cause": null,
+    "modifiers": [
+     "reads_partly_counted"
+    ],
+    "reads": 76400000,
+    "gb": 186.2,
+    "gb_24h": 67.9,
+    "gb_48h": 128.7,
+    "gb_72h": 183.2,
+    "pores": 8203,
+    "occ_first": 0.963,
+    "n50_est": 3128,
+    "read_data": "complete",
+    "t2_passed_gb": 119.7,
+    "t2_n50": 2752,
+    "t2_q_med": 21.94,
+    "t2_usable": 0.677,
+    "t2_samples": 6,
+    "samples": [],
+    "reason_checks": [],
+    "pending": 0,
+    "headline": "The flow cell ran well."
+   },
+   {
+    "id": "TST00105_55555555",
+    "fc": "TST00105",
+    "started": "2026-05-05T09:00:00Z",
+    "hours": 96.0,
+    "run_state": "finished",
+    "verdict": "pass",
+    "health": "pass",
+    "data": "pass",
+    "kit": "SQK-PCB114-24",
+    "product": "FLO-PRO114M",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-A",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "6.10.12",
+    "experiment": "series",
+    "run_name": "pool 5",
+    "folder": "20260501_0900_P2S-00000-A_TST00105_55555555",
+    "project": null,
+    "project_ids": [],
+    "roots": [
+     "minknow",
+     "store"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "quick",
+    "cause": null,
+    "modifiers": [
+     "quick_detail"
+    ],
+    "reads": 76400000,
+    "gb": 186.2,
+    "gb_24h": 67.9,
+    "gb_48h": 128.7,
+    "gb_72h": 183.2,
+    "pores": 8203,
+    "occ_first": 0.963,
+    "n50_est": 3128,
+    "read_data": "complete",
+    "t2_passed_gb": 119.7,
+    "t2_n50": 2752,
+    "t2_q_med": 21.94,
+    "t2_usable": 0.677,
+    "t2_samples": 6,
+    "samples": [],
+    "reason_checks": [],
+    "pending": 5,
+    "headline": "The flow cell ran well.",
+    "t2_conflicts": 2
+   }
+  ],
+  "queries": [
+   "project:alpha",
+   "project:alpha_repeat",
+   "project:beta",
+   "project:ALPHA",
+   "project:alph",
+   "project:\"Beta Two\"",
+   "project:beta_two",
+   "project:alpha,beta_two",
+   "-project:alpha",
+   "status:wran",
+   "status:warn",
+   "status:warning",
+   "health:passs",
+   "data:pass,nonsense",
+   "data:not_assessed",
+   "data:unknown",
+   "verdict:incomplete,fail",
+   "Warning",
+   "is:counting",
+   "is:quick",
+   "is:cut",
+   "is:conflict",
+   "is:waiting",
+   "no:project",
+   "has:project project:alpha"
+  ],
+  "now": "2026-06-01T00:00:00Z"
+ },
+ "expect": [
+  {
+   "ids": [
+    "TST00101_11111111",
+    "TST00103_33333333"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00102_22222222"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00103_33333333"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00101_11111111",
+    "TST00103_33333333"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00101_11111111",
+    "TST00102_22222222",
+    "TST00103_33333333"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00104_44444444"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00104_44444444"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00101_11111111",
+    "TST00103_33333333",
+    "TST00104_44444444"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00102_22222222",
+    "TST00104_44444444",
+    "TST00105_55555555"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00101_11111111",
+    "TST00102_22222222",
+    "TST00103_33333333",
+    "TST00104_44444444",
+    "TST00105_55555555"
+   ],
+   "inactive": [
+    "status:wran"
+   ]
+  },
+  {
+   "ids": [
+    "TST00101_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00101_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00101_11111111",
+    "TST00102_22222222",
+    "TST00103_33333333",
+    "TST00104_44444444",
+    "TST00105_55555555"
+   ],
+   "inactive": [
+    "health:passs"
+   ]
+  },
+  {
+   "ids": [
+    "TST00101_11111111",
+    "TST00102_22222222",
+    "TST00103_33333333",
+    "TST00104_44444444",
+    "TST00105_55555555"
+   ],
+   "inactive": [
+    "data:pass,nonsense"
+   ]
+  },
+  {
+   "ids": [
+    "TST00104_44444444"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00104_44444444"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00104_44444444"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00105_55555555"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00104_44444444",
+    "TST00105_55555555"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00104_44444444"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00105_55555555"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00103_33333333"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00105_55555555"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00101_11111111",
+    "TST00103_33333333"
+   ],
+   "inactive": []
+  }
+ ]
+}

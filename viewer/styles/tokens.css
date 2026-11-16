@@ -1,0 +1,993 @@
+/* FlowCellar design tokens, version 1.1.0
+ *
+ * One file, no imports, no external requests. Licence: MIT, like the rest of FlowCellar.
+ * No font is bundled; the type tokens name system fonts only.
+ *
+ * Themes
+ *   Light is the default. Dark applies when the operating system asks for it, unless the
+ *   page says otherwise with data-theme on any element:
+ *     <html data-theme="light">   always light
+ *     <html data-theme="dark">    always dark
+ *     <div data-theme="dark">     a dark island inside a light page (and the reverse)
+ *     <div data-theme="print">    the print appearance on screen, for previews
+ *   Print always uses the light values with white surfaces, whatever the page is set to.
+ *
+ * Layers
+ *   1. Primitives  --fc-stone-*, --fc-blue-*      raw ramps; do not use in components
+ *   2. Roles       --fc-surface, --fc-text ...    what components use
+ *   3. Data        --fc-cat-*, --fc-seq-*, --fc-state-* ...  what charts use
+ *
+ * Every pair that has to be legible was measured; see design/07_visual_identity.md
+ * section 5 and design/experiments/visual/results/token_checks.md. Re-run
+ * design/experiments/visual/check_tokens.py after changing any colour here.
+ */
+
+/* ==== 1. Primitives and everything that does not change with the theme ==== */
+:root {
+  /* ---- Stone: paper to ink. Warm at the light end, blue-black at the dark end. ---- */
+  --fc-stone-0: #ffffff; --fc-stone-25: #fbfaf8; --fc-stone-50: #f7f6f3; --fc-stone-100: #f1efeb; --fc-stone-150: #e9e7e3; --fc-stone-200: #dedcd7; --fc-stone-300: #cac7c2; --fc-stone-400: #a7a49f; --fc-stone-500: #82807b; --fc-stone-600: #606468; --fc-stone-700: #464b51; --fc-stone-800: #2d333c; --fc-stone-850: #202730; --fc-stone-900: #171f28; --fc-stone-925: #101821; --fc-stone-950: #0a111a;
+  /* ---- Blue: one hue from lamp to ink. Accent, "this run", and the sequential ramp. ---- */
+  --fc-blue-50: #eef5fe; --fc-blue-100: #cde2fb; --fc-blue-200: #9ec5f4; --fc-blue-250: #86b6ef; --fc-blue-300: #6da7ec; --fc-blue-350: #5598e7; --fc-blue-400: #3987e5; --fc-blue-450: #2a78d6; --fc-blue-500: #256abf; --fc-blue-550: #1c5cab; --fc-blue-600: #184f95; --fc-blue-650: #104281; --fc-blue-700: #0d366b; --fc-blue-800: #0a2e57; --fc-blue-900: #0a213c; --fc-blue-950: #07162a;
+  /* ---- Brand ---- */
+  --fc-brand-ink: var(--fc-blue-900);    /* the vault */
+  --fc-brand-lamp: var(--fc-blue-450);   /* the lit cell, on light */
+  --fc-brand-lamp-dark: var(--fc-blue-300); /* the lit cell, on dark */
+  --fc-brand-paper: var(--fc-stone-50);
+
+  /* ---- Type. No font is shipped: a system stack, so nothing to load and nothing to license. ---- */
+  --fc-font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+  --fc-font-mono: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", monospace;
+  --fc-size-caption: 11px;   /* axis ticks, captions, corner tags. Nothing is smaller. */
+  --fc-size-small: 12px;     /* labels, chips, badges, rail */
+  --fc-size-table: 13px;     /* hub table, dense tables */
+  --fc-size-body: 14px;      /* sentences, controls */
+  --fc-size-lead: 16px;      /* verdict sentence, section title */
+  --fc-size-number: 20px;    /* tile value, verdict badge on a laptop */
+  --fc-size-title: 24px;     /* page title: the flow cell ID */
+  --fc-size-display: 32px;   /* one hero number per view; verdict on a tablet uses 26px */
+  --fc-lh-tight: 1.2;        /* numbers, titles */
+  --fc-lh-dense: 1.35;       /* tables, labels */
+  --fc-lh-body: 1.45;        /* sentences */
+  --fc-weight-regular: 400;
+  --fc-weight-strong: 600;   /* the only emphasis weight: present in every system font */
+  --fc-tracking-caps: 0.04em;/* small capital labels only */
+  --fc-measure: 72ch;        /* sentences run 50 to 90 characters */
+
+  /* ---- Space: a 4 px grid, named by size ---- */
+  --fc-space-2: 2px;  --fc-space-4: 4px;  --fc-space-6: 6px;  --fc-space-8: 8px;  --fc-space-12: 12px;
+  --fc-space-16: 16px; --fc-space-20: 20px; --fc-space-24: 24px; --fc-space-32: 32px; --fc-space-40: 40px;
+  --fc-space-48: 48px; --fc-space-64: 64px;
+
+  /* ---- Sizes that the layout depends on ---- */
+  --fc-appbar-h: 40px;
+  --fc-control-h: 28px;      /* buttons, inputs, segmented controls with a mouse */
+  --fc-control-h-touch: 44px;/* the same under a coarse pointer */
+  --fc-row-compact: 32px; --fc-row: 40px; --fc-row-touch: 48px;
+  --fc-row-hub: 44px; --fc-row-hub-compact: 40px;  /* hub rows always have two text lines */
+  --fc-rail-w: 190px; --fc-facets-w: 200px; --fc-drawer-w: 380px; --fc-content-max: 1600px;
+  --fc-target-min: 24px; --fc-target-touch: 44px;
+  --fc-tile-min: 150px;
+
+  /* ---- Radii: small, so the page stays precise. Status badges are squared, chips are pills. ---- */
+  --fc-radius-1: 2px;        /* chart marks, map cells, tick boxes */
+  --fc-radius-2: 4px;        /* controls, badges, tiles */
+  --fc-radius-3: 6px;        /* panels, cards, tooltips */
+  --fc-radius-4: 8px;        /* dialogs, the drawer */
+  --fc-radius-pill: 999px;   /* chips */
+  --fc-border-w: 1px;
+  --fc-focus-w: 2px;
+
+  /* ---- Motion: nothing lasts longer than 150 ms; all of it is off under reduced motion ---- */
+  --fc-dur-1: 80ms;          /* hover, press */
+  --fc-dur-2: 120ms;         /* menus, tooltips, tabs */
+  --fc-dur-3: 150ms;         /* drawers, section open and close, chart transitions */
+  --fc-ease: cubic-bezier(0.2, 0, 0, 1);
+  --fc-stale-opacity: 0.45;  /* a chart that is being redrawn keeps its last picture at this strength */
+
+  /* ---- Layers ---- */
+  --fc-z-sticky: 10; --fc-z-drawer: 20; --fc-z-popover: 30; --fc-z-dialog: 40;
+
+  /* ---- Chart marks ---- */
+  --fc-chart-font: 11px;     /* ticks and labels; chart title uses --fc-size-table at strong weight */
+  --fc-chart-line: 2px;      /* a series line */
+  --fc-chart-line-thin: 1.5px;/* sparklines, overlays of more than four series */
+  --fc-chart-hairline: 1px;  /* grid, axes, cursor, limits */
+  --fc-chart-marker: 8px;    /* end dots and scatter points, plus a 2 px ring in the surface colour */
+  --fc-chart-bar-max: 24px;  /* a bar is never thicker */
+  --fc-chart-bar-radius: 2px;/* at the data end only; square at the baseline; 0 for histogram bins */
+  --fc-chart-gap-w: 2px;     /* between touching fills; 1 px between histogram bins and stacked areas */
+  --fc-chart-min-h: 160px; --fc-track-min-h: 100px;
+  --fc-spark-w: 84px; --fc-spark-h: 18px;
+
+  /* ---- Status glyphs, for use in content: "..." ---- */
+  --fc-glyph-pass: "\2713"; --fc-glyph-warn: "\25B2"; --fc-glyph-fail: "\2715";
+  --fc-glyph-running: "\25B6"; --fc-glyph-incomplete: "\25CB"; --fc-glyph-unknown: "\2013";
+  /* Glyphs that are not verdicts. A notice is never a warning triangle; a direction is never a triangle; "remove" is a thin cross drawn as an icon in a button, never the Fail glyph. */
+  --fc-glyph-info: "\24D8"; --fc-glyph-low: "\2193"; --fc-glyph-high: "\2191";
+  --fc-focus-outline: 2px solid transparent;  /* invisible until forced colours paints it */
+}
+
+/* ==== 2. Light theme (default) ==== */
+:root, [data-theme="light"], [data-theme="print"] {
+  color-scheme: light;
+
+  /* ---- Surfaces ---- */
+  /* Panels are lighter than the page in both themes. No pure black anywhere. */
+  --fc-page: var(--fc-stone-50);  /* behind everything */
+  --fc-surface: var(--fc-stone-0);  /* panels, tables, charts; the chart surface for every contrast check */
+  --fc-surface-raised: var(--fc-stone-0);  /* menus, tooltips, the peek drawer, dialogs */
+  --fc-surface-sunken: var(--fc-stone-100);  /* table header, track label column, wells, code */
+  --fc-surface-hover: var(--fc-stone-100);  /* row or control under the pointer */
+  --fc-surface-selected: var(--fc-blue-50);  /* ticked row, chosen menu item (always with a tick or an outline as well) */
+  --fc-surface-inverse: var(--fc-blue-900);  /* application bar, selection tray, strong banner */
+  --fc-scrim: rgba(10, 17, 26, 0.32);  /* behind a dialog */
+
+  /* ---- Text ---- */
+  /* Each role meets 4.5:1 on page, surface and sunken surface (checked). */
+  --fc-text: var(--fc-stone-950);  /* values, headings, body */
+  --fc-text-secondary: var(--fc-stone-700);  /* reading sentences, captions, second lines */
+  --fc-text-muted: var(--fc-stone-600);  /* axis ticks, labels, placeholders, "not assessed" */
+  --fc-text-disabled: var(--fc-stone-400);  /* struck-through control values; exempt from 4.5:1, never the only carrier */
+  --fc-text-inverse: var(--fc-stone-50);  /* on the inverse surface */
+  --fc-text-inverse-muted: #a9b9ca;  /* secondary text on the inverse surface */
+  --fc-text-on-accent: #ffffff;  /* label on an accent fill */
+
+  /* ---- Borders ---- */
+  --fc-border: var(--fc-stone-200);  /* hairline between rows, around panels and tiles */
+  --fc-border-strong: var(--fc-stone-300);  /* section rules, group header rows, table header underline */
+  --fc-border-control: var(--fc-stone-500);  /* outline of inputs, buttons, tick boxes: 3:1 against its surface */
+  --fc-border-inverse: rgba(247, 246, 243, 0.28);  /* outlines on the inverse surface */
+
+  /* ---- Accent and focus ---- */
+  /* One blue. It is also data colour 1: "this run". */
+  --fc-accent: var(--fc-blue-500);  /* primary button fill, selected tab marker, slider */
+  --fc-accent-hover: var(--fc-blue-550);
+  --fc-accent-active: var(--fc-blue-600);
+  --fc-accent-text: var(--fc-blue-550);  /* links and link-like buttons; links are also underlined */
+  --fc-accent-subtle: var(--fc-blue-50);  /* tint behind a selected chip */
+  --fc-accent-border: var(--fc-blue-200);
+  --fc-focus: var(--fc-blue-450);  /* focus ring colour */
+  --fc-focus-inverse: var(--fc-blue-300);  /* focus ring on the inverse surface */
+  --fc-focus-ring: 0 0 0 2px var(--fc-surface), 0 0 0 4px var(--fc-focus);  /* two rings: a gap in the surface colour, then the ring, so it shows against any neighbour. Always paired with a real, transparent outline (--fc-focus-outline) that forced colours turns visible */
+  --fc-evidence-line: var(--fc-text);  /* outline of "the evidence is here", draggable filter lines, drag handles: the text colour, never the accent, which equals a data colour */
+  --fc-evidence-ring: 0 0 0 2px var(--fc-surface), 0 0 0 4px var(--fc-text);  /* the same double ring as focus, in ink */
+  --fc-evidence-subtle: var(--fc-stone-100);  /* tint behind an evidence strip */
+
+  /* ---- Status ---- */
+  /* Never colour alone: every status has a glyph, a word and a fill density (tokens below and 07 */
+  /* section 4). */
+  --fc-status-pass-fg: #025939;  /* text and glyph on the surface or on its tint */
+  --fc-status-pass-bg: #e0f7e9;  /* tint behind a badge or a banner */
+  --fc-status-pass-border: #179765;  /* outline, limit line; 3:1 on the surface */
+  --fc-status-pass-solid: #179765;  /* solid badge fill, status dot */
+  --fc-status-pass-on-solid: var(--fc-stone-950);  /* label on the solid fill */
+  --fc-status-warn-fg: #734301;
+  --fc-status-warn-bg: #fdefcb;
+  --fc-status-warn-border: #b87501;
+  --fc-status-warn-solid: #f2ab19;
+  --fc-status-warn-on-solid: var(--fc-stone-950);
+  --fc-status-fail-fg: #9e1618;
+  --fc-status-fail-bg: #feebe9;
+  --fc-status-fail-border: #b7191c;
+  --fc-status-fail-solid: #b7191c;
+  --fc-status-fail-on-solid: #ffffff;
+  --fc-status-running-fg: var(--fc-stone-800);
+  --fc-status-running-bg: transparent;
+  --fc-status-running-border: var(--fc-stone-700);
+  --fc-status-running-solid: var(--fc-stone-900);
+  --fc-status-running-on-solid: #ffffff;
+  --fc-status-incomplete-fg: var(--fc-stone-700);
+  --fc-status-incomplete-bg: var(--fc-stone-100);
+  --fc-status-incomplete-border: var(--fc-stone-500);
+  --fc-status-incomplete-solid: var(--fc-stone-600);
+  --fc-status-incomplete-on-solid: #ffffff;
+  --fc-status-unknown-fg: var(--fc-stone-600);
+  --fc-status-unknown-bg: transparent;
+  --fc-status-unknown-border: var(--fc-stone-500);
+  --fc-status-unknown-solid: var(--fc-stone-500);
+  --fc-status-unknown-on-solid: var(--fc-stone-950);
+
+  /* ---- Chart furniture ---- */
+  /* Recessive: the data is the only thing allowed to be loud. */
+  --fc-chart-surface: var(--fc-surface);
+  --fc-chart-grid: #e9e7e3;  /* gridlines: solid hairlines, never dashed */
+  --fc-chart-axis: var(--fc-stone-300);  /* baseline and axis line */
+  --fc-chart-tick: var(--fc-stone-600);  /* tick labels and axis titles */
+  --fc-chart-label: var(--fc-stone-700);  /* direct labels, legend text */
+  --fc-chart-annotation: var(--fc-stone-800);  /* N50 and median markers, event ticks */
+  --fc-chart-cursor: var(--fc-stone-600);  /* hover hairline */
+  --fc-chart-typical: #e0deda;  /* band "typical for this lab"; always labelled once per page */
+  --fc-chart-typical-line: var(--fc-stone-400);  /* median of comparable runs, ghost line */
+  --fc-chart-typical-edge: var(--fc-stone-500);  /* edge line of the typical band, 3:1 on the surface: the fill alone is 1.2 to 1.3:1 and vanishes on a projector */
+  --fc-chart-limit-halo: var(--fc-surface);  /* 2 px halo behind a limit line where it crosses a fill */
+  --fc-chart-gap: var(--fc-surface);  /* 2 px gap between touching fills, ring around markers */
+  --fc-chart-none: var(--fc-surface);  /* a cell with no data: hollow, outlined with chart-none-line */
+  --fc-chart-none-line: var(--fc-stone-500);  /* outline of a cell with no data: 3:1, so "no data" cannot be read as "a little" */
+  --fc-chart-none-hatch: var(--fc-stone-400);  /* diagonal hatch inside a no-data cell of 6 px or more */
+  --fc-chart-pattern: rgba(10, 17, 26, 0.55);  /* ink of the hatching used in patterns mode and print */
+  --fc-on-data-dark: var(--fc-stone-950);  /* label inside a light fill */
+  --fc-on-data-light: #ffffff;  /* label inside a dark fill */
+
+  /* ---- Data: categorical, 12 colours in a fixed ring order ---- */
+  /* Assign in order, never by rank, never cycled. Slots 1 to 8 are the limit for series told */
+  /* apart by colour; 9 to 12 exist for barcode slots and other fixed families that also carry a */
+  /* label and a pattern. */
+  --fc-cat-1: #2a78d6;  /* blue */
+  --fc-cat-2: #eb6834;  /* orange */
+  --fc-cat-3: #1baf7a;  /* aqua */
+  --fc-cat-4: #6250d6;  /* violet */
+  --fc-cat-5: #eda100;  /* yellow */
+  --fc-cat-6: #e87ba4;  /* magenta */
+  --fc-cat-7: #008300;  /* green */
+  --fc-cat-8: #872e78;  /* plum */
+  --fc-cat-9: #53bada;  /* sky */
+  --fc-cat-10: #90511f;  /* brown */
+  --fc-cat-11: #265496;  /* steel */
+  --fc-cat-12: #86962c;  /* olive */
+
+  /* ---- Data: sequential, one hue, 9 steps, low to high ---- */
+  /* Heat maps and the flow cell map. Low is near the surface in both themes. Interpolate in */
+  /* OKLab between steps for a continuous scale. */
+  --fc-seq-1: #e8f2ff;
+  --fc-seq-2: #cde2fb;
+  --fc-seq-3: #9ec5f4;
+  --fc-seq-4: #6da7ec;
+  --fc-seq-5: #3987e5;
+  --fc-seq-6: #256abf;
+  --fc-seq-7: #184f95;
+  --fc-seq-8: #0d366b;
+  --fc-seq-9: #0a213c;
+
+  /* ---- Data: ordinal, one hue, 5 steps ---- */
+  /* Ordered classes (good wells per channel 0 to 4, quality bands). Lightest step still 2:1 on */
+  /* the surface. */
+  --fc-ord-1: #86b6ef;
+  --fc-ord-2: #5598e7;
+  --fc-ord-3: #2a78d6;
+  --fc-ord-4: #1c5cab;
+  --fc-ord-5: #104281;
+
+  /* ---- Data: diverging, 7 steps ---- */
+  /* Below and above a reference (lab typical, a second run). Orange to blue through a neutral; */
+  /* red and green are not used, so "below" never reads as "fail". */
+  --fc-div-neg-3: #803a02;
+  --fc-div-neg-2: #d0630e;
+  --fc-div-neg-1: #e9a679;
+  --fc-div-mid: #e9e7e3;
+  --fc-div-pos-1: #86b6ef;
+  --fc-div-pos-2: #3987e5;
+  --fc-div-pos-3: #184f95;
+
+  /* ---- Data: fixed colours of recurring categories ---- */
+  /* A category keeps its colour on every chart, in every run, on every surface. */
+  --fc-this-run: var(--fc-cat-1);  /* the single series of a chart: this run, this sample */
+  /* Reads */
+  --fc-reads-pass: var(--fc-cat-1);  /* reads that passed the quality filter */
+  --fc-reads-fail: var(--fc-cat-2);  /* reads that did not; hatched in patterns mode */
+  --fc-reads-all: var(--fc-stone-700);  /* all reads, drawn as an outline */
+  /* Channel states (channel activity). MinKNOW's hue families, re-stepped for contrast */
+  --fc-state-strand: #5cb572;  /* Sequencing */
+  --fc-state-adapter: #dec85c;  /* Adapter */
+  --fc-state-pore: #146d34;  /* Pore available */
+  --fc-state-unavailable: #379a9a;  /* Unavailable */
+  --fc-state-unblocking: #98338c;  /* Active feedback (ejecting) */
+  --fc-state-no-pore: #a9d1ea;  /* No pore */
+  --fc-state-zero: #3699b8;  /* Zero */
+  --fc-state-disabled: #cfd9dd;  /* Channel disabled */
+  --fc-state-unknown-positive: #066786;  /* Out of range, high */
+  --fc-state-unknown-negative: #bfb2a4;  /* Out of range, low */
+  --fc-state-multiple: #dd6f23;  /* Multiple */
+  --fc-state-saturated: #4d5a62;  /* Saturated */
+  --fc-state-locked: #94928e;  /* Pending reselection */
+  --fc-state-membrane: #c6c4c0;  /* Membrane only */
+  --fc-state-unclassified: #65635f;  /* Unclassified */
+  --fc-state-unclassified-following-reset: #c6c4c0;  /* Unclassified following reset */
+  --fc-state-pending-manual-reset: #94928e;  /* Pending manual reset */
+  --fc-state-pending-mux-change: #65635f;  /* Pending mux change */
+  /* The five groups MinKNOW uses, the default view */
+  --fc-stategroup-sequencing: var(--fc-state-strand);  /* Sequencing */
+  --fc-stategroup-pore: var(--fc-state-pore);  /* Pore free */
+  --fc-stategroup-recovering: var(--fc-state-unavailable);  /* Recovering */
+  --fc-stategroup-inactive: var(--fc-state-no-pore);  /* No pore */
+  --fc-stategroup-unclassified: var(--fc-state-locked);  /* Unclassified */
+  /* Pore scan results (wells) */
+  --fc-scan-single-pore: var(--fc-state-pore);  /* Available */
+  --fc-scan-reserved-pore: var(--fc-state-adapter);  /* In reserve */
+  --fc-scan-unavailable: var(--fc-state-unavailable);  /* Unavailable */
+  --fc-scan-multiple: var(--fc-state-multiple);  /* Multiple */
+  --fc-scan-saturated: var(--fc-state-saturated);  /* Saturated */
+  --fc-scan-zero: var(--fc-state-zero);  /* Zero */
+  --fc-scan-other: var(--fc-state-unknown-positive);  /* Other */
+  /* Why reads ended (end reasons) */
+  --fc-end-signal-positive: #6da7ec;  /* Ended normally */
+  --fc-end-unblock-mux-change: #98338c;  /* Ejected: strand stalled */
+  --fc-end-data-service-unblock-mux-change: #e38ab5;  /* Ejected by adaptive sampling */
+  --fc-end-signal-negative: #dd6f23;  /* Ended with a current drop */
+  --fc-end-mux-change: #379a9a;  /* Cut by a pore scan */
+  --fc-end-analysis-config-change: #4d5a62;  /* Settings changed */
+  --fc-end-device-data-error: #bfb2a4;  /* Device data error */
+  --fc-end-api-request: #767471;  /* Stopped by software */
+  --fc-end-paused: #cfd9dd;  /* Paused */
+  --fc-end-unknown: #a09e9a;  /* Not recorded */
+  --fc-end-other: #bfbdb9;  /* Other (the five technical reasons added up) */
+  /* Read fate */
+  --fc-fate-usable: var(--fc-cat-1);  /* Usable: counted towards a transcript, or mapped */
+  --fc-fate-unmapped: var(--fc-cat-3);  /* Not mapped or not counted */
+  --fc-fate-not-full-length: var(--fc-cat-4);  /* Not full-length */
+  --fc-fate-no-barcode: #bfbdb9;  /* No barcode found */
+  --fc-fate-unexpected-barcode: #767471;  /* Unexpected barcode */
+  --fc-fate-failed-filter: var(--fc-cat-2);  /* Did not pass the quality filter */
+  --fc-fate-unknown-line: var(--fc-stone-500);  /* Outline of a stage that is "not known"; never filled */
+  /* cDNA classification */
+  --fc-cdna-full-length: var(--fc-cat-1);  /* Full-length */
+  --fc-cdna-rescued: var(--fc-cat-3);  /* Rescued from a fused read */
+  --fc-cdna-unusable: var(--fc-cat-2);  /* Unusable */
+  --fc-cdna-length-fail: #bfbdb9;  /* Too short */
+  --fc-cdna-quality-fail: #767471;  /* Below quality */
+  /* Barcode slots: slot n takes colour ((n - 1) mod 12) + 1 and pattern tier floor((n - 1) / 12) */
+  --fc-barcode-none: #bfbdb9;  /* No barcode found */
+  --fc-barcode-unexpected: #767471;  /* Unexpected barcode; always hatched */
+
+  /* ---- Elevation ---- */
+  /* Flat by default: a hairline does the separating. Shadows only for things that float. */
+  --fc-shadow-1: 0 1px 2px rgba(10, 17, 26, 0.06);  /* sticky bars */
+  --fc-shadow-2: 0 4px 12px rgba(10, 17, 26, 0.10), 0 1px 3px rgba(10, 17, 26, 0.08);  /* menus, tooltips, hover cards */
+  --fc-shadow-3: 0 12px 32px rgba(10, 17, 26, 0.16), 0 2px 6px rgba(10, 17, 26, 0.08);  /* peek drawer, dialogs */
+}
+
+/* ==== 3. Dark theme. The two blocks below are identical: one for the system setting, one for the switch. ==== */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    /* ---- Surfaces ---- */
+    --fc-page: var(--fc-stone-925);
+    --fc-surface: var(--fc-stone-900);
+    --fc-surface-raised: var(--fc-stone-850);
+    --fc-surface-sunken: var(--fc-stone-950);
+    --fc-surface-hover: var(--fc-stone-850);
+    --fc-surface-selected: #15273e;
+    --fc-surface-inverse: var(--fc-stone-950);
+    --fc-scrim: rgba(0, 0, 0, 0.5);
+
+    /* ---- Text ---- */
+    --fc-text: var(--fc-stone-100);
+    --fc-text-secondary: var(--fc-stone-300);
+    --fc-text-muted: var(--fc-stone-400);
+    --fc-text-disabled: var(--fc-stone-600);
+    --fc-text-inverse: var(--fc-stone-100);
+    --fc-text-inverse-muted: #9ba6b1;
+    --fc-text-on-accent: var(--fc-stone-950);
+
+    /* ---- Borders ---- */
+    --fc-border: var(--fc-stone-800);
+    --fc-border-strong: #3b424c;
+    --fc-border-control: #7b8088;
+    --fc-border-inverse: rgba(241, 239, 235, 0.22);
+
+    /* ---- Accent and focus ---- */
+    --fc-accent: var(--fc-blue-400);
+    --fc-accent-hover: var(--fc-blue-350);
+    --fc-accent-active: var(--fc-blue-300);
+    --fc-accent-text: var(--fc-blue-250);
+    --fc-accent-subtle: #15273e;
+    --fc-accent-border: var(--fc-blue-600);
+    --fc-focus: var(--fc-blue-300);
+    --fc-focus-inverse: var(--fc-blue-300);
+    --fc-focus-ring: 0 0 0 2px var(--fc-surface), 0 0 0 4px var(--fc-focus);
+    --fc-evidence-line: var(--fc-text);
+    --fc-evidence-ring: 0 0 0 2px var(--fc-surface), 0 0 0 4px var(--fc-text);
+    --fc-evidence-subtle: var(--fc-stone-850);
+
+    /* ---- Status ---- */
+    --fc-status-pass-fg: #71d6a3;
+    --fc-status-pass-bg: #132c20;
+    --fc-status-pass-border: #53c48e;
+    --fc-status-pass-solid: #53c48e;
+    --fc-status-pass-on-solid: var(--fc-stone-950);
+    --fc-status-warn-fg: #f1c45e;
+    --fc-status-warn-bg: #37290f;
+    --fc-status-warn-border: #cd9219;
+    --fc-status-warn-solid: #f4b93c;
+    --fc-status-warn-on-solid: var(--fc-stone-950);
+    --fc-status-fail-fg: #fb9795;
+    --fc-status-fail-bg: #3e1e1c;
+    --fc-status-fail-border: #e54c4a;
+    --fc-status-fail-solid: #e54c4a;
+    --fc-status-fail-on-solid: var(--fc-stone-950);
+    --fc-status-running-fg: var(--fc-stone-200);
+    --fc-status-running-bg: transparent;
+    --fc-status-running-border: var(--fc-stone-300);
+    --fc-status-running-solid: var(--fc-stone-50);
+    --fc-status-running-on-solid: var(--fc-stone-950);
+    --fc-status-incomplete-fg: var(--fc-stone-300);
+    --fc-status-incomplete-bg: var(--fc-stone-850);
+    --fc-status-incomplete-border: #7b8088;
+    --fc-status-incomplete-solid: var(--fc-stone-400);
+    --fc-status-incomplete-on-solid: var(--fc-stone-950);
+    --fc-status-unknown-fg: var(--fc-stone-400);
+    --fc-status-unknown-bg: transparent;
+    --fc-status-unknown-border: #7b8088;
+    --fc-status-unknown-solid: var(--fc-stone-500);
+    --fc-status-unknown-on-solid: var(--fc-stone-950);
+
+    /* ---- Chart furniture ---- */
+    --fc-chart-surface: var(--fc-surface);
+    --fc-chart-grid: #252c36;
+    --fc-chart-axis: #3b424c;
+    --fc-chart-tick: var(--fc-stone-400);
+    --fc-chart-label: var(--fc-stone-300);
+    --fc-chart-annotation: var(--fc-stone-200);
+    --fc-chart-cursor: var(--fc-stone-400);
+    --fc-chart-typical: #292e35;
+    --fc-chart-typical-line: var(--fc-stone-600);
+    --fc-chart-typical-edge: #7b8088;
+    --fc-chart-limit-halo: var(--fc-surface);
+    --fc-chart-gap: var(--fc-surface);
+    --fc-chart-none: var(--fc-surface);
+    --fc-chart-none-line: #7b8088;
+    --fc-chart-none-hatch: var(--fc-stone-600);
+    --fc-chart-pattern: rgba(241, 239, 235, 0.6);
+    --fc-on-data-dark: var(--fc-stone-950);
+    --fc-on-data-light: #ffffff;
+
+    /* ---- Data: categorical, 12 colours in a fixed ring order ---- */
+    --fc-cat-1: #3987e5;
+    --fc-cat-2: #d95926;
+    --fc-cat-3: #199e70;
+    --fc-cat-4: #9085e9;
+    --fc-cat-5: #c98500;
+    --fc-cat-6: #d55181;
+    --fc-cat-7: #008300;
+    --fc-cat-8: #a84d97;
+    --fc-cat-9: #36a0c0;
+    --fc-cat-10: #a05f2f;
+    --fc-cat-11: #5b7ec8;
+    --fc-cat-12: #80902b;
+
+    /* ---- Data: sequential, one hue, 9 steps, low to high ---- */
+    --fc-seq-1: #182e4b;
+    --fc-seq-2: #1c3f6a;
+    --fc-seq-3: #184f95;
+    --fc-seq-4: #256abf;
+    --fc-seq-5: #3987e5;
+    --fc-seq-6: #6da7ec;
+    --fc-seq-7: #9ec5f4;
+    --fc-seq-8: #cde2fb;
+    --fc-seq-9: #eaf3fe;
+
+    /* ---- Data: ordinal, one hue, 5 steps ---- */
+    --fc-ord-1: #184f95;
+    --fc-ord-2: #256abf;
+    --fc-ord-3: #3987e5;
+    --fc-ord-4: #6da7ec;
+    --fc-ord-5: #9ec5f4;
+
+    /* ---- Data: diverging, 7 steps ---- */
+    --fc-div-neg-3: #f1b27e;
+    --fc-div-neg-2: #db772f;
+    --fc-div-neg-1: #a74d03;
+    --fc-div-mid: #2d333c;
+    --fc-div-pos-1: #256abf;
+    --fc-div-pos-2: #5598e7;
+    --fc-div-pos-3: #9ec5f4;
+
+    /* ---- Data: fixed colours of recurring categories ---- */
+    --fc-this-run: var(--fc-cat-1);
+    --fc-reads-pass: var(--fc-cat-1);
+    --fc-reads-fail: var(--fc-cat-2);
+    --fc-reads-all: var(--fc-stone-300);
+    --fc-state-strand: #62bb78;
+    --fc-state-adapter: #e5ce6d;
+    --fc-state-pore: #196632;
+    --fc-state-unavailable: #379a9a;
+    --fc-state-unblocking: #e59ad8;
+    --fc-state-no-pore: #335166;
+    --fc-state-zero: #3ea0be;
+    --fc-state-disabled: #2f373a;
+    --fc-state-unknown-positive: #126a88;
+    --fc-state-unknown-negative: #bcaea1;
+    --fc-state-multiple: #cf6924;
+    --fc-state-saturated: #becdd6;
+    --fc-state-locked: #7d8185;
+    --fc-state-membrane: #adb1b6;
+    --fc-state-unclassified: #4f5357;
+    --fc-state-unclassified-following-reset: #adb1b6;
+    --fc-state-pending-manual-reset: #7d8185;
+    --fc-state-pending-mux-change: #4f5357;
+    --fc-stategroup-sequencing: var(--fc-state-strand);
+    --fc-stategroup-pore: var(--fc-state-pore);
+    --fc-stategroup-recovering: var(--fc-state-unavailable);
+    --fc-stategroup-inactive: var(--fc-state-no-pore);
+    --fc-stategroup-unclassified: var(--fc-state-locked);
+    --fc-scan-single-pore: var(--fc-state-pore);
+    --fc-scan-reserved-pore: var(--fc-state-adapter);
+    --fc-scan-unavailable: var(--fc-state-unavailable);
+    --fc-scan-multiple: var(--fc-state-multiple);
+    --fc-scan-saturated: var(--fc-state-saturated);
+    --fc-scan-zero: var(--fc-state-zero);
+    --fc-scan-other: var(--fc-state-unknown-positive);
+    --fc-end-signal-positive: #3987e5;
+    --fc-end-unblock-mux-change: #e59ad8;
+    --fc-end-data-service-unblock-mux-change: #b24981;
+    --fc-end-signal-negative: #cf6924;
+    --fc-end-mux-change: #379a9a;
+    --fc-end-analysis-config-change: #becdd6;
+    --fc-end-device-data-error: #817262;
+    --fc-end-api-request: #3f4347;
+    --fc-end-paused: #9da6ab;
+    --fc-end-unknown: #66696d;
+    --fc-end-other: #4f5357;
+    --fc-fate-usable: var(--fc-cat-1);
+    --fc-fate-unmapped: var(--fc-cat-3);
+    --fc-fate-not-full-length: var(--fc-cat-4);
+    --fc-fate-no-barcode: #4f5357;
+    --fc-fate-unexpected-barcode: #83878b;
+    --fc-fate-failed-filter: var(--fc-cat-2);
+    --fc-fate-unknown-line: #7b8088;
+    --fc-cdna-full-length: var(--fc-cat-1);
+    --fc-cdna-rescued: var(--fc-cat-3);
+    --fc-cdna-unusable: var(--fc-cat-2);
+    --fc-cdna-length-fail: #4f5357;
+    --fc-cdna-quality-fail: #83878b;
+    --fc-barcode-none: #4f5357;
+    --fc-barcode-unexpected: #83878b;
+
+    /* ---- Elevation ---- */
+    --fc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --fc-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(241, 239, 235, 0.06);
+    --fc-shadow-3: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(241, 239, 235, 0.08);
+  }
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* ---- Surfaces ---- */
+  --fc-page: var(--fc-stone-925);
+  --fc-surface: var(--fc-stone-900);
+  --fc-surface-raised: var(--fc-stone-850);
+  --fc-surface-sunken: var(--fc-stone-950);
+  --fc-surface-hover: var(--fc-stone-850);
+  --fc-surface-selected: #15273e;
+  --fc-surface-inverse: var(--fc-stone-950);
+  --fc-scrim: rgba(0, 0, 0, 0.5);
+
+  /* ---- Text ---- */
+  --fc-text: var(--fc-stone-100);
+  --fc-text-secondary: var(--fc-stone-300);
+  --fc-text-muted: var(--fc-stone-400);
+  --fc-text-disabled: var(--fc-stone-600);
+  --fc-text-inverse: var(--fc-stone-100);
+  --fc-text-inverse-muted: #9ba6b1;
+  --fc-text-on-accent: var(--fc-stone-950);
+
+  /* ---- Borders ---- */
+  --fc-border: var(--fc-stone-800);
+  --fc-border-strong: #3b424c;
+  --fc-border-control: #7b8088;
+  --fc-border-inverse: rgba(241, 239, 235, 0.22);
+
+  /* ---- Accent and focus ---- */
+  --fc-accent: var(--fc-blue-400);
+  --fc-accent-hover: var(--fc-blue-350);
+  --fc-accent-active: var(--fc-blue-300);
+  --fc-accent-text: var(--fc-blue-250);
+  --fc-accent-subtle: #15273e;
+  --fc-accent-border: var(--fc-blue-600);
+  --fc-focus: var(--fc-blue-300);
+  --fc-focus-inverse: var(--fc-blue-300);
+  --fc-focus-ring: 0 0 0 2px var(--fc-surface), 0 0 0 4px var(--fc-focus);
+  --fc-evidence-line: var(--fc-text);
+  --fc-evidence-ring: 0 0 0 2px var(--fc-surface), 0 0 0 4px var(--fc-text);
+  --fc-evidence-subtle: var(--fc-stone-850);
+
+  /* ---- Status ---- */
+  --fc-status-pass-fg: #71d6a3;
+  --fc-status-pass-bg: #132c20;
+  --fc-status-pass-border: #53c48e;
+  --fc-status-pass-solid: #53c48e;
+  --fc-status-pass-on-solid: var(--fc-stone-950);
+  --fc-status-warn-fg: #f1c45e;
+  --fc-status-warn-bg: #37290f;
+  --fc-status-warn-border: #cd9219;
+  --fc-status-warn-solid: #f4b93c;
+  --fc-status-warn-on-solid: var(--fc-stone-950);
+  --fc-status-fail-fg: #fb9795;
+  --fc-status-fail-bg: #3e1e1c;
+  --fc-status-fail-border: #e54c4a;
+  --fc-status-fail-solid: #e54c4a;
+  --fc-status-fail-on-solid: var(--fc-stone-950);
+  --fc-status-running-fg: var(--fc-stone-200);
+  --fc-status-running-bg: transparent;
+  --fc-status-running-border: var(--fc-stone-300);
+  --fc-status-running-solid: var(--fc-stone-50);
+  --fc-status-running-on-solid: var(--fc-stone-950);
+  --fc-status-incomplete-fg: var(--fc-stone-300);
+  --fc-status-incomplete-bg: var(--fc-stone-850);
+  --fc-status-incomplete-border: #7b8088;
+  --fc-status-incomplete-solid: var(--fc-stone-400);
+  --fc-status-incomplete-on-solid: var(--fc-stone-950);
+  --fc-status-unknown-fg: var(--fc-stone-400);
+  --fc-status-unknown-bg: transparent;
+  --fc-status-unknown-border: #7b8088;
+  --fc-status-unknown-solid: var(--fc-stone-500);
+  --fc-status-unknown-on-solid: var(--fc-stone-950);
+
+  /* ---- Chart furniture ---- */
+  --fc-chart-surface: var(--fc-surface);
+  --fc-chart-grid: #252c36;
+  --fc-chart-axis: #3b424c;
+  --fc-chart-tick: var(--fc-stone-400);
+  --fc-chart-label: var(--fc-stone-300);
+  --fc-chart-annotation: var(--fc-stone-200);
+  --fc-chart-cursor: var(--fc-stone-400);
+  --fc-chart-typical: #292e35;
+  --fc-chart-typical-line: var(--fc-stone-600);
+  --fc-chart-typical-edge: #7b8088;
+  --fc-chart-limit-halo: var(--fc-surface);
+  --fc-chart-gap: var(--fc-surface);
+  --fc-chart-none: var(--fc-surface);
+  --fc-chart-none-line: #7b8088;
+  --fc-chart-none-hatch: var(--fc-stone-600);
+  --fc-chart-pattern: rgba(241, 239, 235, 0.6);
+  --fc-on-data-dark: var(--fc-stone-950);
+  --fc-on-data-light: #ffffff;
+
+  /* ---- Data: categorical, 12 colours in a fixed ring order ---- */
+  --fc-cat-1: #3987e5;
+  --fc-cat-2: #d95926;
+  --fc-cat-3: #199e70;
+  --fc-cat-4: #9085e9;
+  --fc-cat-5: #c98500;
+  --fc-cat-6: #d55181;
+  --fc-cat-7: #008300;
+  --fc-cat-8: #a84d97;
+  --fc-cat-9: #36a0c0;
+  --fc-cat-10: #a05f2f;
+  --fc-cat-11: #5b7ec8;
+  --fc-cat-12: #80902b;
+
+  /* ---- Data: sequential, one hue, 9 steps, low to high ---- */
+  --fc-seq-1: #182e4b;
+  --fc-seq-2: #1c3f6a;
+  --fc-seq-3: #184f95;
+  --fc-seq-4: #256abf;
+  --fc-seq-5: #3987e5;
+  --fc-seq-6: #6da7ec;
+  --fc-seq-7: #9ec5f4;
+  --fc-seq-8: #cde2fb;
+  --fc-seq-9: #eaf3fe;
+
+  /* ---- Data: ordinal, one hue, 5 steps ---- */
+  --fc-ord-1: #184f95;
+  --fc-ord-2: #256abf;
+  --fc-ord-3: #3987e5;
+  --fc-ord-4: #6da7ec;
+  --fc-ord-5: #9ec5f4;
+
+  /* ---- Data: diverging, 7 steps ---- */
+  --fc-div-neg-3: #f1b27e;
+  --fc-div-neg-2: #db772f;
+  --fc-div-neg-1: #a74d03;
+  --fc-div-mid: #2d333c;
+  --fc-div-pos-1: #256abf;
+  --fc-div-pos-2: #5598e7;
+  --fc-div-pos-3: #9ec5f4;
+
+  /* ---- Data: fixed colours of recurring categories ---- */
+  --fc-this-run: var(--fc-cat-1);
+  --fc-reads-pass: var(--fc-cat-1);
+  --fc-reads-fail: var(--fc-cat-2);
+  --fc-reads-all: var(--fc-stone-300);
+  --fc-state-strand: #62bb78;
+  --fc-state-adapter: #e5ce6d;
+  --fc-state-pore: #196632;
+  --fc-state-unavailable: #379a9a;
+  --fc-state-unblocking: #e59ad8;
+  --fc-state-no-pore: #335166;
+  --fc-state-zero: #3ea0be;
+  --fc-state-disabled: #2f373a;
+  --fc-state-unknown-positive: #126a88;
+  --fc-state-unknown-negative: #bcaea1;
+  --fc-state-multiple: #cf6924;
+  --fc-state-saturated: #becdd6;
+  --fc-state-locked: #7d8185;
+  --fc-state-membrane: #adb1b6;
+  --fc-state-unclassified: #4f5357;
+  --fc-state-unclassified-following-reset: #adb1b6;
+  --fc-state-pending-manual-reset: #7d8185;
+  --fc-state-pending-mux-change: #4f5357;
+  --fc-stategroup-sequencing: var(--fc-state-strand);
+  --fc-stategroup-pore: var(--fc-state-pore);
+  --fc-stategroup-recovering: var(--fc-state-unavailable);
+  --fc-stategroup-inactive: var(--fc-state-no-pore);
+  --fc-stategroup-unclassified: var(--fc-state-locked);
+  --fc-scan-single-pore: var(--fc-state-pore);
+  --fc-scan-reserved-pore: var(--fc-state-adapter);
+  --fc-scan-unavailable: var(--fc-state-unavailable);
+  --fc-scan-multiple: var(--fc-state-multiple);
+  --fc-scan-saturated: var(--fc-state-saturated);
+  --fc-scan-zero: var(--fc-state-zero);
+  --fc-scan-other: var(--fc-state-unknown-positive);
+  --fc-end-signal-positive: #3987e5;
+  --fc-end-unblock-mux-change: #e59ad8;
+  --fc-end-data-service-unblock-mux-change: #b24981;
+  --fc-end-signal-negative: #cf6924;
+  --fc-end-mux-change: #379a9a;
+  --fc-end-analysis-config-change: #becdd6;
+  --fc-end-device-data-error: #817262;
+  --fc-end-api-request: #3f4347;
+  --fc-end-paused: #9da6ab;
+  --fc-end-unknown: #66696d;
+  --fc-end-other: #4f5357;
+  --fc-fate-usable: var(--fc-cat-1);
+  --fc-fate-unmapped: var(--fc-cat-3);
+  --fc-fate-not-full-length: var(--fc-cat-4);
+  --fc-fate-no-barcode: #4f5357;
+  --fc-fate-unexpected-barcode: #83878b;
+  --fc-fate-failed-filter: var(--fc-cat-2);
+  --fc-fate-unknown-line: #7b8088;
+  --fc-cdna-full-length: var(--fc-cat-1);
+  --fc-cdna-rescued: var(--fc-cat-3);
+  --fc-cdna-unusable: var(--fc-cat-2);
+  --fc-cdna-length-fail: #4f5357;
+  --fc-cdna-quality-fail: #83878b;
+  --fc-barcode-none: #4f5357;
+  --fc-barcode-unexpected: #83878b;
+
+  /* ---- Elevation ---- */
+  --fc-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --fc-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(241, 239, 235, 0.06);
+  --fc-shadow-3: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(241, 239, 235, 0.08);
+}
+
+/* ==== 4. Print: light values on white, no shadows, heavier hairlines. Patterns are switched on by the viewer. ==== */
+[data-theme="print"] {
+  --fc-page: #ffffff;
+  --fc-surface-sunken: #ffffff;
+  --fc-surface-hover: #ffffff;
+  --fc-surface-selected: #ffffff;
+  --fc-surface-inverse: #ffffff;
+  --fc-text-inverse: var(--fc-stone-950);
+  --fc-text-inverse-muted: var(--fc-stone-700);
+  --fc-border: var(--fc-stone-300);
+  --fc-border-strong: var(--fc-stone-500);
+  --fc-border-inverse: var(--fc-stone-300);
+  --fc-chart-grid: #dedcd7;
+  --fc-chart-typical: #e9e7e3;
+  --fc-shadow-1: none;
+  --fc-shadow-2: none;
+  --fc-shadow-3: none;
+}
+@media print {
+  :root, [data-theme] {
+    color-scheme: light;
+
+    /* ---- Surfaces ---- */
+    --fc-page: #ffffff;
+    --fc-surface: var(--fc-stone-0);
+    --fc-surface-raised: var(--fc-stone-0);
+    --fc-surface-sunken: #ffffff;
+    --fc-surface-hover: #ffffff;
+    --fc-surface-selected: #ffffff;
+    --fc-surface-inverse: #ffffff;
+    --fc-scrim: rgba(10, 17, 26, 0.32);
+
+    /* ---- Text ---- */
+    --fc-text: var(--fc-stone-950);
+    --fc-text-secondary: var(--fc-stone-700);
+    --fc-text-muted: var(--fc-stone-600);
+    --fc-text-disabled: var(--fc-stone-400);
+    --fc-text-inverse: var(--fc-stone-950);
+    --fc-text-inverse-muted: var(--fc-stone-700);
+    --fc-text-on-accent: #ffffff;
+
+    /* ---- Borders ---- */
+    --fc-border: var(--fc-stone-300);
+    --fc-border-strong: var(--fc-stone-500);
+    --fc-border-control: var(--fc-stone-500);
+    --fc-border-inverse: var(--fc-stone-300);
+
+    /* ---- Accent and focus ---- */
+    --fc-accent: var(--fc-blue-500);
+    --fc-accent-hover: var(--fc-blue-550);
+    --fc-accent-active: var(--fc-blue-600);
+    --fc-accent-text: var(--fc-blue-550);
+    --fc-accent-subtle: var(--fc-blue-50);
+    --fc-accent-border: var(--fc-blue-200);
+    --fc-focus: var(--fc-blue-450);
+    --fc-focus-inverse: var(--fc-blue-300);
+    --fc-focus-ring: 0 0 0 2px var(--fc-surface), 0 0 0 4px var(--fc-focus);
+    --fc-evidence-line: var(--fc-text);
+    --fc-evidence-ring: 0 0 0 2px var(--fc-surface), 0 0 0 4px var(--fc-text);
+    --fc-evidence-subtle: var(--fc-stone-100);
+
+    /* ---- Status ---- */
+    --fc-status-pass-fg: #025939;
+    --fc-status-pass-bg: #e0f7e9;
+    --fc-status-pass-border: #179765;
+    --fc-status-pass-solid: #179765;
+    --fc-status-pass-on-solid: var(--fc-stone-950);
+    --fc-status-warn-fg: #734301;
+    --fc-status-warn-bg: #fdefcb;
+    --fc-status-warn-border: #b87501;
+    --fc-status-warn-solid: #f2ab19;
+    --fc-status-warn-on-solid: var(--fc-stone-950);
+    --fc-status-fail-fg: #9e1618;
+    --fc-status-fail-bg: #feebe9;
+    --fc-status-fail-border: #b7191c;
+    --fc-status-fail-solid: #b7191c;
+    --fc-status-fail-on-solid: #ffffff;
+    --fc-status-running-fg: var(--fc-stone-800);
+    --fc-status-running-bg: transparent;
+    --fc-status-running-border: var(--fc-stone-700);
+    --fc-status-running-solid: var(--fc-stone-900);
+    --fc-status-running-on-solid: #ffffff;
+    --fc-status-incomplete-fg: var(--fc-stone-700);
+    --fc-status-incomplete-bg: var(--fc-stone-100);
+    --fc-status-incomplete-border: var(--fc-stone-500);
+    --fc-status-incomplete-solid: var(--fc-stone-600);
+    --fc-status-incomplete-on-solid: #ffffff;
+    --fc-status-unknown-fg: var(--fc-stone-600);
+    --fc-status-unknown-bg: transparent;
+    --fc-status-unknown-border: var(--fc-stone-500);
+    --fc-status-unknown-solid: var(--fc-stone-500);
+    --fc-status-unknown-on-solid: var(--fc-stone-950);
+
+    /* ---- Chart furniture ---- */
+    --fc-chart-surface: var(--fc-surface);
+    --fc-chart-grid: #dedcd7;
+    --fc-chart-axis: var(--fc-stone-300);
+    --fc-chart-tick: var(--fc-stone-600);
+    --fc-chart-label: var(--fc-stone-700);
+    --fc-chart-annotation: var(--fc-stone-800);
+    --fc-chart-cursor: var(--fc-stone-600);
+    --fc-chart-typical: #e9e7e3;
+    --fc-chart-typical-line: var(--fc-stone-400);
+    --fc-chart-typical-edge: var(--fc-stone-500);
+    --fc-chart-limit-halo: var(--fc-surface);
+    --fc-chart-gap: var(--fc-surface);
+    --fc-chart-none: var(--fc-surface);
+    --fc-chart-none-line: var(--fc-stone-500);
+    --fc-chart-none-hatch: var(--fc-stone-400);
+    --fc-chart-pattern: rgba(10, 17, 26, 0.55);
+    --fc-on-data-dark: var(--fc-stone-950);
+    --fc-on-data-light: #ffffff;
+
+    /* ---- Data: categorical, 12 colours in a fixed ring order ---- */
+    --fc-cat-1: #2a78d6;
+    --fc-cat-2: #eb6834;
+    --fc-cat-3: #1baf7a;
+    --fc-cat-4: #6250d6;
+    --fc-cat-5: #eda100;
+    --fc-cat-6: #e87ba4;
+    --fc-cat-7: #008300;
+    --fc-cat-8: #872e78;
+    --fc-cat-9: #53bada;
+    --fc-cat-10: #90511f;
+    --fc-cat-11: #265496;
+    --fc-cat-12: #86962c;
+
+    /* ---- Data: sequential, one hue, 9 steps, low to high ---- */
+    --fc-seq-1: #e8f2ff;
+    --fc-seq-2: #cde2fb;
+    --fc-seq-3: #9ec5f4;
+    --fc-seq-4: #6da7ec;
+    --fc-seq-5: #3987e5;
+    --fc-seq-6: #256abf;
+    --fc-seq-7: #184f95;
+    --fc-seq-8: #0d366b;
+    --fc-seq-9: #0a213c;
+
+    /* ---- Data: ordinal, one hue, 5 steps ---- */
+    --fc-ord-1: #86b6ef;
+    --fc-ord-2: #5598e7;
+    --fc-ord-3: #2a78d6;
+    --fc-ord-4: #1c5cab;
+    --fc-ord-5: #104281;
+
+    /* ---- Data: diverging, 7 steps ---- */
+    --fc-div-neg-3: #803a02;
+    --fc-div-neg-2: #d0630e;
+    --fc-div-neg-1: #e9a679;
+    --fc-div-mid: #e9e7e3;
+    --fc-div-pos-1: #86b6ef;
+    --fc-div-pos-2: #3987e5;
+    --fc-div-pos-3: #184f95;
+
+    /* ---- Data: fixed colours of recurring categories ---- */
+    --fc-this-run: var(--fc-cat-1);
+    --fc-reads-pass: var(--fc-cat-1);
+    --fc-reads-fail: var(--fc-cat-2);
+    --fc-reads-all: var(--fc-stone-700);
+    --fc-state-strand: #5cb572;
+    --fc-state-adapter: #dec85c;
+    --fc-state-pore: #146d34;
+    --fc-state-unavailable: #379a9a;
+    --fc-state-unblocking: #98338c;
+    --fc-state-no-pore: #a9d1ea;
+    --fc-state-zero: #3699b8;
+    --fc-state-disabled: #cfd9dd;
+    --fc-state-unknown-positive: #066786;
+    --fc-state-unknown-negative: #bfb2a4;
+    --fc-state-multiple: #dd6f23;
+    --fc-state-saturated: #4d5a62;
+    --fc-state-locked: #94928e;
+    --fc-state-membrane: #c6c4c0;
+    --fc-state-unclassified: #65635f;
+    --fc-state-unclassified-following-reset: #c6c4c0;
+    --fc-state-pending-manual-reset: #94928e;
+    --fc-state-pending-mux-change: #65635f;
+    --fc-stategroup-sequencing: var(--fc-state-strand);
+    --fc-stategroup-pore: var(--fc-state-pore);
+    --fc-stategroup-recovering: var(--fc-state-unavailable);
+    --fc-stategroup-inactive: var(--fc-state-no-pore);
+    --fc-stategroup-unclassified: var(--fc-state-locked);
+    --fc-scan-single-pore: var(--fc-state-pore);
+    --fc-scan-reserved-pore: var(--fc-state-adapter);
+    --fc-scan-unavailable: var(--fc-state-unavailable);
+    --fc-scan-multiple: var(--fc-state-multiple);
+    --fc-scan-saturated: var(--fc-state-saturated);
+    --fc-scan-zero: var(--fc-state-zero);
+    --fc-scan-other: var(--fc-state-unknown-positive);
+    --fc-end-signal-positive: #6da7ec;
+    --fc-end-unblock-mux-change: #98338c;
+    --fc-end-data-service-unblock-mux-change: #e38ab5;
+    --fc-end-signal-negative: #dd6f23;
+    --fc-end-mux-change: #379a9a;
+    --fc-end-analysis-config-change: #4d5a62;
+    --fc-end-device-data-error: #bfb2a4;
+    --fc-end-api-request: #767471;
+    --fc-end-paused: #cfd9dd;
+    --fc-end-unknown: #a09e9a;
+    --fc-end-other: #bfbdb9;
+    --fc-fate-usable: var(--fc-cat-1);
+    --fc-fate-unmapped: var(--fc-cat-3);
+    --fc-fate-not-full-length: var(--fc-cat-4);
+    --fc-fate-no-barcode: #bfbdb9;
+    --fc-fate-unexpected-barcode: #767471;
+    --fc-fate-failed-filter: var(--fc-cat-2);
+    --fc-fate-unknown-line: var(--fc-stone-500);
+    --fc-cdna-full-length: var(--fc-cat-1);
+    --fc-cdna-rescued: var(--fc-cat-3);
+    --fc-cdna-unusable: var(--fc-cat-2);
+    --fc-cdna-length-fail: #bfbdb9;
+    --fc-cdna-quality-fail: #767471;
+    --fc-barcode-none: #bfbdb9;
+    --fc-barcode-unexpected: #767471;
+
+    /* ---- Elevation ---- */
+    --fc-shadow-1: none;
+    --fc-shadow-2: none;
+    --fc-shadow-3: none;
+  }
+  @page { size: A4; margin: 14mm 12mm 16mm; }
+}
+
+/* ==== 5. Preferences ==== */
+@media (prefers-reduced-motion: reduce) {
+  :root { --fc-dur-1: 0ms; --fc-dur-2: 0ms; --fc-dur-3: 0ms; }
+}
+@media (pointer: coarse) {
+  :root { --fc-control-h: var(--fc-control-h-touch); --fc-row: var(--fc-row-touch); --fc-row-compact: var(--fc-row-touch); --fc-target-min: var(--fc-target-touch); }
+}
+@media (prefers-contrast: more) {
+  :root, [data-theme="light"] { --fc-border: var(--fc-stone-400); --fc-border-strong: var(--fc-stone-600); --fc-text-muted: var(--fc-stone-700); --fc-chart-grid: var(--fc-stone-300); }
+  [data-theme="dark"] { --fc-border: var(--fc-stone-600); --fc-border-strong: var(--fc-stone-400); --fc-text-muted: var(--fc-stone-200); --fc-chart-grid: var(--fc-stone-700); }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) { --fc-border: var(--fc-stone-600); --fc-border-strong: var(--fc-stone-400); --fc-text-muted: var(--fc-stone-200); --fc-chart-grid: var(--fc-stone-700); }
+}
+@media (forced-colors: active) {
+  /* The system palette takes over. Every role a component or the chart kit reads points at a system colour, so nothing is dark on dark. */
+  /* The chart kit builds its Theme from these through a probe element; halos are dropped and patterns switched on. */
+  :root, [data-theme] {
+    --fc-page: Canvas; --fc-surface: Canvas; --fc-surface-sunken: Canvas; --fc-surface-raised: Canvas; --fc-surface-hover: Canvas; --fc-surface-selected: Highlight;
+    --fc-text: CanvasText; --fc-text-secondary: CanvasText; --fc-text-muted: CanvasText; --fc-text-disabled: GrayText; --fc-accent-text: LinkText;
+    --fc-border: CanvasText; --fc-border-strong: CanvasText; --fc-border-control: ButtonText; --fc-focus: Highlight; --fc-accent: Highlight; --fc-text-on-accent: HighlightText;
+    --fc-focus-outline: 2px solid Highlight; --fc-evidence-line: CanvasText;
+    --fc-chart-surface: Canvas; --fc-chart-grid: GrayText; --fc-chart-axis: CanvasText; --fc-chart-tick: CanvasText; --fc-chart-label: CanvasText; --fc-chart-annotation: CanvasText;
+    --fc-chart-cursor: CanvasText; --fc-chart-gap: Canvas; --fc-chart-limit-halo: transparent; --fc-chart-typical: Canvas; --fc-chart-typical-edge: GrayText; --fc-chart-typical-line: GrayText;
+    --fc-chart-none: Canvas; --fc-chart-none-line: GrayText; --fc-chart-none-hatch: GrayText; --fc-chart-pattern: CanvasText; --fc-this-run: CanvasText; --fc-on-data-dark: Canvas; --fc-on-data-light: Canvas;
+  }
+}

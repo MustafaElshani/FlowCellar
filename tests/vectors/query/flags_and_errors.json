@@ -1,0 +1,682 @@
+{
+ "name": "flags, negation and terms that cannot be read",
+ "function": "query.filter",
+ "about": "Rows are run columns of the index, each with 'samples' (the names and aliases of its samples). 'expect' holds, per query, the ids that match in row order and the terms that cannot be read: such a term is left out and the others still filter. Python: flowcellar.library.query.run_vector; viewer: makeEngine(rows, Date.parse(now)).run(query).",
+ "args": {
+  "now": "2026-11-13T12:00:00Z",
+  "rows": [
+   {
+    "id": "TST00006_66666666",
+    "fc": "TST00006",
+    "started": "2026-11-04T15:42:00Z",
+    "hours": 96.0,
+    "run_state": "finished",
+    "verdict": "pass",
+    "health": "pass",
+    "data": "pass",
+    "kit": "SQK-PCB114-24",
+    "product": "FLO-PRO114M",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-A",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "6.10.12",
+    "experiment": "tissue_series",
+    "run_name": "tumour pool Ä",
+    "folder": "20261104_1542_P2S-00000-A_TST00006_66666666",
+    "project": "tissues",
+    "project_ids": [
+     "tissues"
+    ],
+    "roots": [
+     "minknow",
+     "store"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "full",
+    "cause": null,
+    "modifiers": [],
+    "reads": 76400000,
+    "gb": 186.2,
+    "gb_24h": 67.9,
+    "gb_48h": 128.7,
+    "gb_72h": 183.2,
+    "pores": 8203,
+    "occ_first": 0.963,
+    "n50_est": 3128,
+    "read_data": "complete",
+    "t2_passed_gb": 119.7,
+    "t2_n50": 2752,
+    "t2_q_med": 21.94,
+    "t2_usable": 0.677,
+    "t2_samples": 6,
+    "samples": [
+     "tumour_ctrl_1",
+     "TC1",
+     "tumour_drug_1",
+     "TD1"
+    ],
+    "reason_checks": [],
+    "pending": 0
+   },
+   {
+    "id": "TST00005_55555555",
+    "fc": "TST00005",
+    "started": "2026-10-29T09:10:00Z",
+    "hours": 71.5,
+    "run_state": "finished",
+    "verdict": "warn",
+    "health": "warn",
+    "data": "not_available",
+    "kit": "SQK-NBD114-24",
+    "product": "FLO-MIN114",
+    "device_type": "MINION_MK1D",
+    "position": "MD-000001",
+    "assay": "native barcoding",
+    "assay_group": "gdna",
+    "minknow": "6.10.12",
+    "experiment": "plate_survey_1",
+    "run_name": "survey plate 1",
+    "folder": "20261029_0910_MD-000001_TST00005_55555555",
+    "project": "plate_survey",
+    "project_ids": [
+     "plate_survey"
+    ],
+    "roots": [
+     "minknow"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "quick",
+    "cause": null,
+    "modifiers": [
+     "no_history",
+     "quick_detail"
+    ],
+    "reads": 7682230,
+    "gb": 9.6,
+    "gb_24h": 5.1,
+    "gb_48h": 8.2,
+    "gb_72h": null,
+    "pores": 1180,
+    "occ_first": 0.68,
+    "n50_est": null,
+    "read_data": "absent",
+    "t2_passed_gb": null,
+    "t2_n50": null,
+    "t2_q_med": null,
+    "t2_usable": null,
+    "t2_samples": null,
+    "samples": [],
+    "reason_checks": [
+     "fc_occupancy_first_hour"
+    ],
+    "pending": 4
+   },
+   {
+    "id": "TST00004_44444444",
+    "fc": "TST00004",
+    "started": "2026-06-03T10:58:00Z",
+    "hours": 72.0,
+    "run_state": "finished",
+    "verdict": "pass",
+    "health": "pass",
+    "data": "warn",
+    "kit": "SQK-PCB114-24",
+    "product": "FLO-PRO114M",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-B",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "6.5.14",
+    "experiment": "cell_line_series",
+    "run_name": "line B drug",
+    "folder": "renamed by hand",
+    "project": "cell_lines",
+    "project_ids": [
+     "cell_lines",
+     "tissues"
+    ],
+    "roots": [
+     "store"
+    ],
+    "source_state": "offline",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "full",
+    "cause": null,
+    "modifiers": [
+     "baseline_provisional"
+    ],
+    "reads": 54400000,
+    "gb": 131.0,
+    "gb_24h": 49.0,
+    "gb_48h": 98.0,
+    "gb_72h": 131.0,
+    "pores": 6900,
+    "occ_first": 0.91,
+    "n50_est": 2500,
+    "read_data": "partial",
+    "t2_passed_gb": 80.5,
+    "t2_n50": 2400,
+    "t2_q_med": 19.5,
+    "t2_usable": 0.55,
+    "t2_samples": 4,
+    "samples": [
+     "line_b_ctrl"
+    ],
+    "reason_checks": [],
+    "pending": 0
+   },
+   {
+    "id": "TST00003_33333333",
+    "fc": "TST00003",
+    "started": "2025-12-23T14:20:00Z",
+    "hours": 67.7,
+    "run_state": "finished",
+    "verdict": "warn",
+    "health": "warn",
+    "data": "pass",
+    "kit": "SQK-PCB111-24",
+    "product": "FLO-PRO002",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-A",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "5.4.3",
+    "experiment": "cell_line_series",
+    "run_name": "line A reload",
+    "folder": "20251223_1420_P2S-00000-A_TST00003_33333333",
+    "project": "cell_lines",
+    "project_ids": [
+     "cell_lines"
+    ],
+    "roots": [
+     "store"
+    ],
+    "source_state": "ok",
+    "use": 3,
+    "restart": false,
+    "detail_t1": "full",
+    "cause": null,
+    "modifiers": [
+     "reused_flow_cell",
+     "judged_before_older_runs"
+    ],
+    "reads": 21000000,
+    "gb": 40.2,
+    "gb_24h": 18.0,
+    "gb_48h": 33.5,
+    "gb_72h": null,
+    "pores": 2900,
+    "occ_first": 0.74,
+    "n50_est": 1900,
+    "read_data": "complete",
+    "t2_passed_gb": 31.0,
+    "t2_n50": 1850,
+    "t2_q_med": 12.4,
+    "t2_usable": 0.41,
+    "t2_samples": 12,
+    "samples": [
+     "line_a_ctrl",
+     "LA-C"
+    ],
+    "reason_checks": [
+     "yield_reads_at_48h"
+    ],
+    "pending": 0
+   },
+   {
+    "id": "TST00003_22222222",
+    "fc": "TST00003",
+    "started": "2025-12-23T12:05:00Z",
+    "hours": 0.08,
+    "run_state": "finished",
+    "verdict": "incomplete",
+    "health": "incomplete",
+    "data": "not_available",
+    "kit": "SQK-PCB111-24",
+    "product": "FLO-PRO002",
+    "device_type": "P2_SOLO",
+    "position": "P2S-00000-A",
+    "assay": "cDNA-PCR",
+    "assay_group": "cdna",
+    "minknow": "5.4.3",
+    "experiment": "cell_line_series",
+    "run_name": "line A reload",
+    "folder": "20251223_1205_P2S-00000-A_TST00003_22222222",
+    "project": "cell_lines",
+    "project_ids": [
+     "cell_lines"
+    ],
+    "roots": [
+     "store"
+    ],
+    "source_state": "missing",
+    "use": 3,
+    "restart": true,
+    "detail_t1": "quick",
+    "cause": "stopped_early",
+    "modifiers": [
+     "reused_flow_cell"
+    ],
+    "reads": 1200,
+    "gb": 0.001,
+    "gb_24h": null,
+    "gb_48h": null,
+    "gb_72h": null,
+    "pores": 3100,
+    "occ_first": null,
+    "n50_est": null,
+    "read_data": "absent",
+    "t2_passed_gb": null,
+    "t2_n50": null,
+    "t2_q_med": null,
+    "t2_usable": null,
+    "t2_samples": null,
+    "samples": [],
+    "reason_checks": [],
+    "pending": 4
+   },
+   {
+    "id": "TST00002_11111111",
+    "fc": "TST00002",
+    "started": "2026-11-12T08:00:00Z",
+    "hours": 20.0,
+    "run_state": "running",
+    "verdict": "running",
+    "health": "running",
+    "data": "not_available",
+    "kit": "SQK-LSK114",
+    "product": "FLO-MIN114",
+    "device_type": "MINION_MK1D",
+    "position": "MD-000001",
+    "assay": "ligation",
+    "assay_group": "gdna",
+    "minknow": "6.10.12",
+    "experiment": "plasmid_check",
+    "run_name": "plasmids",
+    "folder": "20261112_0800_MD-000001_TST00002_11111111",
+    "project": null,
+    "project_ids": [],
+    "roots": [
+     "minknow"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "quick",
+    "cause": null,
+    "modifiers": [],
+    "reads": null,
+    "gb": null,
+    "gb_24h": null,
+    "gb_48h": null,
+    "gb_72h": null,
+    "pores": 900,
+    "occ_first": null,
+    "n50_est": null,
+    "read_data": "absent",
+    "t2_passed_gb": null,
+    "t2_n50": null,
+    "t2_q_med": null,
+    "t2_usable": null,
+    "t2_samples": null,
+    "samples": [],
+    "reason_checks": [],
+    "pending": 4
+   },
+   {
+    "id": "TST00001_0f0e0d0c",
+    "fc": "TST00001",
+    "started": null,
+    "hours": null,
+    "run_state": "raw_only",
+    "verdict": "incomplete",
+    "health": "incomplete",
+    "data": "not_available",
+    "kit": null,
+    "product": null,
+    "device_type": null,
+    "position": null,
+    "assay": "unknown",
+    "assay_group": "unknown",
+    "minknow": null,
+    "experiment": null,
+    "run_name": null,
+    "folder": "20240521_1726_P2S-00000-A_TST00001_0f0e0d0c",
+    "project": "archive",
+    "project_ids": [
+     "archive"
+    ],
+    "roots": [
+     "store"
+    ],
+    "source_state": "ok",
+    "use": 1,
+    "restart": false,
+    "detail_t1": "none",
+    "cause": "raw_only",
+    "modifiers": [],
+    "reads": null,
+    "gb": null,
+    "gb_24h": null,
+    "gb_48h": null,
+    "gb_72h": null,
+    "pores": null,
+    "occ_first": null,
+    "n50_est": null,
+    "read_data": "absent",
+    "t2_passed_gb": null,
+    "t2_n50": null,
+    "t2_q_med": null,
+    "t2_usable": null,
+    "t2_samples": null,
+    "samples": [],
+    "reason_checks": [],
+    "pending": 0
+   }
+  ],
+  "queries": [
+   "is:reused",
+   "is:first-use",
+   "is:restart",
+   "is:quick",
+   "is:counting",
+   "is:full",
+   "is:early",
+   "is:raw",
+   "is:running",
+   "is:offline",
+   "is:stale",
+   "is:reused,running",
+   "has:reads",
+   "no:reads",
+   "no:reads hours:>24",
+   "has:history",
+   "has:report",
+   "no:project",
+   "has:project -is:raw",
+   "-is:reused -is:running",
+   "-status:pass",
+   "-plasmid -fc:TST00003",
+   "statsu:warn",
+   "status:warn nosuchfield:1",
+   "reads:many",
+   "reads:>5Gb",
+   "is:purple",
+   "last:soon fc:TST00006",
+   "after:tomorrow",
+   "kit:"
+  ]
+ },
+ "expect": [
+  {
+   "ids": [
+    "TST00003_33333333",
+    "TST00003_22222222"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00002_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00003_22222222"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00005_55555555",
+    "TST00003_22222222",
+    "TST00002_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00005_55555555",
+    "TST00003_22222222",
+    "TST00002_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00004_44444444",
+    "TST00003_33333333"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00004_44444444"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00002_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00004_44444444",
+    "TST00003_22222222"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00003_33333333"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00004_44444444",
+    "TST00003_33333333"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00005_55555555",
+    "TST00003_22222222",
+    "TST00002_11111111",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00005_55555555"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00004_44444444",
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00002_11111111"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00003_33333333",
+    "TST00003_22222222"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00005_55555555",
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": []
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": [
+    "statsu:warn"
+   ]
+  },
+  {
+   "ids": [
+    "TST00005_55555555",
+    "TST00003_33333333"
+   ],
+   "inactive": [
+    "nosuchfield:1"
+   ]
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": [
+    "reads:many"
+   ]
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": [
+    "reads:>5Gb"
+   ]
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": [
+    "is:purple"
+   ]
+  },
+  {
+   "ids": [
+    "TST00006_66666666"
+   ],
+   "inactive": [
+    "last:soon"
+   ]
+  },
+  {
+   "ids": [
+    "TST00006_66666666",
+    "TST00005_55555555",
+    "TST00004_44444444",
+    "TST00003_33333333",
+    "TST00003_22222222",
+    "TST00002_11111111",
+    "TST00001_0f0e0d0c"
+   ],
+   "inactive": [
+    "after:tomorrow"
+   ]
+  },
+  {
+   "ids": [],
+   "inactive": []
+  }
+ ]
+}

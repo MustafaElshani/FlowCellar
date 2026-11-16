@@ -1,0 +1,2075 @@
+# FlowCellar: catalogue of the single-cell and spatial add-on (product copy).
+# Source of src/flowcellar/sc/catalogue.json: edit here, then run tools/build_sc_catalogue.py.
+# No name, path or flow cell id of any real analysis belongs in this file.
+schema: flowcellar.metrics-catalogue/1
+module: sc
+module_title: Single-cell and spatial add-on
+catalogue_version: 0.1.0
+section_schema_version: 1
+assays:
+  singlecell: droplet libraries (3', 5', multiome gene expression) sequenced on ONT, analysed with wf-single-cell
+  visium: Visium, 55 um spots, ONT reads through wf-single-cell and/or Space Ranger
+  visium_hd: Visium HD 3' (2 um squares), ONT reads through Space Ranger and/or wf-single-cell
+units:
+  singlecell:
+    name: cell
+    plural: cells
+  visium:
+    name: spot
+    plural: spots
+  visium_hd:
+    name: 8 µm bin
+    plural: 8 µm bins
+aggregate_types:
+  scalar: one number or short string
+  counts: named integer counts (a dict); mergeable by addition
+  funnel: ordered list of {stage, reads}; each stage is a subset of the previous one
+  hist: counts on fixed bin edges named in `bins` below; mergeable by addition
+  rank_curve: 'values at log-spaced ranks (<= 200 points): {rank[], value[]}'
+  curve: '{x[], y[]} with <= 32 points'
+  table: small list of rows, <= 50
+  grid: '2-D map: rows, cols, layout and channels; each channel is one byte per cell, row-major, base64 (u8-b64)'
+  messages: list of {level, title, message, value, source}
+  links: list of run links, see `link_model`
+bins:
+  log_counts_8_per_decade:
+    description: 0, then 8 bins per decade from 1 to 1e6 (49 bins). Used for UMIs, genes and reads per barcode.
+  fraction_50:
+    description: 50 linear bins from 0 to 1 (2 percentage points each). Used for mitochondrial fraction.
+  reads_per_molecule:
+    description: exact counts 1..64, then one bin per power of two up to 2**20 (78 bins)
+inputs:
+- id: wf_params_json
+  pipeline: wf-single-cell
+  path: params.json
+  format: json
+  fields:
+  - bam
+  - fastq
+  - spaceranger_bam
+  - adapter_stats
+  - kit
+  - full_length_only
+  - min_read_qual
+  - barcode_max_ed
+  - barcode_min_ed_diff
+  - gene_assigns_minqv
+  - matrix_min_genes
+  - matrix_min_cells
+  - matrix_max_mito
+  - expected_cells
+  - estimate_cell_count
+  - mito_prefix
+  - ref_genome_dir
+  - call_fusions
+  - wf.container_sha
+- id: wf_config_stats_json
+  pipeline: wf-single-cell
+  path: <alias>/config_stats.json (v2) | <alias>/<alias>.config_stats.json (v3, per ONT documentation)
+  format: json
+  fields:
+  - reads
+  - full_length
+  - stranded
+  - plus
+  - minus
+  - full_len
+  - single_adapter1
+  - single_adapter2
+  - double_adapter1
+  - double_adapter2
+  - no_adapters
+  - other
+- id: wf_read_summary_tsv
+  pipeline: wf-single-cell
+  path: <alias>/read_tags.tsv (v2) | <alias>/<alias>.read_summary.tsv (v3)
+  format: tsv
+  fields:
+  - read_id
+  - uncorrected_barcode
+  - corrected_barcode
+  - quality_barcode
+  - uncorrected_umi
+  - corrected_umi
+  - quality_umi
+  - gene
+  - transcript
+  - start
+  - end
+  - chr
+- id: wf_matrix_mex
+  pipeline: wf-single-cell
+  path: <alias>/[<alias>.]{gene,transcript}_{raw,processed}_feature_bc_matrix[_2um|_8um]/{matrix.mtx.gz,barcodes.tsv.gz,features.tsv.gz}
+  format: MatrixMarket coordinate + TSV
+- id: wf_mito_tsv
+  pipeline: wf-single-cell
+  path: <alias>/gene.expression.mito-per-cell.tsv (v2) | <alias>/<alias>.gene_expression_mito_per_cell.tsv (v3)
+  format: tsv
+  fields:
+  - CB
+  - mito_pct
+- id: wf_whitelist_tsv
+  pipeline: wf-single-cell
+  path: <alias>/whitelist.tsv (v2) | <alias>/<alias>.whitelist.tsv (v3 per documentation)
+  format: one barcode per line
+- id: wf_tagged_bam
+  pipeline: wf-single-cell
+  path: <alias>/tagged.bam (v2) | <alias>/<alias>.tagged.bam (v3) + .bai
+  format: bam
+  fields:
+  - CB
+  - CR
+  - CY
+  - UB
+  - UR
+  - UY
+  - GN
+  - TR
+  - 'plus Dorado tags carried through: fn st ch mx du ns qs pi sp er po sm sd sv dx'
+- id: wf_trace_txt
+  pipeline: wf-single-cell
+  path: execution/trace.txt
+  format: tsv
+  fields:
+  - task_id
+  - hash
+  - native_id
+  - name
+  - status
+  - exit
+  - submit
+  - duration
+  - realtime
+  - '%cpu'
+  - peak_rss
+  - peak_vmem
+  - rchar
+  - wchar
+- id: wf_report_html
+  pipeline: wf-single-cell
+  path: wf-single-cell-report.html
+  format: html
+- id: wf_bc_assignment_summary
+  pipeline: wf-single-cell
+  path: <alias>/<alias>.bc_assignment_summary.tsv
+  format: tsv
+- id: sr_metrics_summary_csv
+  pipeline: spaceranger
+  path: outs/metrics_summary.csv
+  format: csv, one header row + one value row
+- id: sr_metrics_summary_json
+  pipeline: spaceranger
+  path: SPATIAL_RNA_COUNTER_CS/**/SPATIAL_REPORTER/fork0/join-*/files/metrics_summary_json.json (beside outs/; one folder
+    level deeper in 4.x than in 3.0.1)
+  format: json
+- id: sr_web_summary_html
+  pipeline: spaceranger
+  path: outs/web_summary.html
+  format: 'html with one JSON object: `const data = {...}`'
+- id: sr_molecule_info_h5
+  pipeline: spaceranger
+  path: outs/molecule_info.h5
+  format: hdf5
+  fields:
+  - count (uint32, reads per molecule)
+  - barcode_idx
+  - barcodes
+  - feature_idx
+  - umi
+  - barcode_info/pass_filter
+  - metrics_json (scalar JSON string)
+- id: sr_feature_slice_h5
+  pipeline: spaceranger
+  path: outs/feature_slice.h5
+  format: hdf5
+  fields:
+  - umis/total
+  - reads/sequenced
+  - reads/barcode_corrected_sequenced
+  - reads/unmapped_reads
+  - reads/half_mapped
+  - reads/split_mapped
+  - masks/filtered
+  - masks/square_008um
+  - masks/square_016um
+  - images/microscope
+  - images/cytassist
+  - segmentations/cell_segmentation_mask
+  - feature_slices/<feature index>
+  - features/name
+  - attr metadata_json
+- id: sr_matrix_h5
+  pipeline: spaceranger
+  path: outs/{raw,filtered}_feature_bc_matrix.h5 | outs/binned_outputs/square_{002,008,016}um/{raw,filtered}_feature_bc_matrix.h5
+    | outs/segmented_outputs/{raw,filtered}_feature_cell_matrix.h5
+  format: hdf5, CSC (matrix/data, indices, indptr, barcodes, features/*)
+- id: sr_tissue_positions
+  pipeline: spaceranger
+  path: outs/spatial/tissue_positions.csv (Visium) | outs/binned_outputs/square_XXXum/spatial/tissue_positions.parquet (Visium
+    HD)
+  format: csv | parquet
+  fields:
+  - barcode
+  - in_tissue
+  - array_row
+  - array_col
+  - pxl_row_in_fullres
+  - pxl_col_in_fullres
+- id: sr_scalefactors
+  pipeline: spaceranger
+  path: outs/spatial/scalefactors_json.json | outs/binned_outputs/square_XXXum/spatial/scalefactors_json.json
+  format: json
+  fields:
+  - spot_diameter_fullres
+  - fiducial_diameter_fullres
+  - tissue_hires_scalef
+  - tissue_lowres_scalef
+  - bin_size_um
+  - microns_per_pixel
+  - regist_target_img_scalef
+- id: sr_bam
+  pipeline: spaceranger
+  path: outs/possorted_genome_bam.bam + .bai
+  format: bam
+- id: sr_pipestance_meta
+  pipeline: spaceranger
+  path: _versions, _cmdline, _invocation (siblings of outs/, when kept)
+  format: json / text / mro
+identity_fields:
+- id: analysis_id
+  source: sha1 of pipeline name + sample id + bytes of the primary metrics file (metrics_summary.csv, or config_stats.json
+    + matrix header for wf-single-cell)
+- id: assay
+  source: params.json `kit` (visium_hd:v1, visium:v1, 3prime:v3 ...) | molecule_info metrics_json `chemistry_name` (SPATIAL3Pv1,
+    SPATIAL-HD-v1-3P)
+- id: sample_label
+  source: Space Ranger `Sample ID` | wf-single-cell alias (directory name; `SAMPLE_S1_L001` in percula-driven runs, so the
+    Space Ranger id wins when both exist)
+- id: slide_serial_capture_area
+  source: molecule_info.h5 metrics_json | feature_slice.h5 attr metadata_json | BAM @CO
+- id: pipeline_versions
+  source: matrix h5 attr `software_version` / molecule_info `cellranger_version` | wf-single-cell report footer text `workflow
+    (X.Y.Z)`
+- id: reference
+  source: params.json ref_genome_dir | web_summary `Transcriptome` | molecule_info reference_fasta_hash
+- id: cytassist_run
+  source: 'web_summary sample table: CytAssist Run Name, Instrument Serial ID, Software Version (Visium HD)'
+- id: sibling_analysis
+  source: params.json `spaceranger_bam` -> the Space Ranger outs/ that belongs to the same sample
+link_model:
+  key: flow_cell_id + protocol_run_id (first 8 hex are enough) [+ acquisition_run_id first 8 hex]
+  evidence_ladder:
+  - id: bam_fn_tag
+    confidence: high
+    how: Dorado `fn` tag = <flow_cell_id>_<protocol_run_id[:8]>_<acquisition_run_id[:8]>_<n>.pod5 on records of the wf-single-cell
+      tagged BAM; tally over <= 100,000 primary records fetched from 24 regions through the index
+    works_for: wf-single-cell >= 3 started from a Dorado BAM
+  - id: bam_rg_header
+    confidence: high
+    how: '@RG PU (flow cell) and DS runid= when a Dorado header survives'
+  - id: sibling
+    confidence: high
+    how: Space Ranger outs/ inherits the links of the wf-single-cell analysis whose params.json `spaceranger_bam` points
+      at it
+  - id: read_id_sketch
+    confidence: high
+    how: compare the analysis' read ids starting with `0000` (a 1/65,536 sample; ONT read ids are random UUIDs) with the
+      same sketch stored in each run bundle
+    works_for: 'anything that keeps read names: wf-single-cell v2 read_tags.tsv, Space Ranger BAM, FASTQ. Requires the core
+      to store the sketch.'
+  - id: path_and_sample_id
+    confidence: medium
+    how: a MinKNOW run folder is a sibling of the analysis folder's parent AND its sample_id equals the workflow alias after
+      normalising (case-fold, strip leading and trailing punctuation)
+  - id: sample_id_only
+    confidence: low
+    how: exactly one run in the library has a normalised sample_id equal to the normalised alias
+  - id: user
+    confidence: high
+    how: '`--run FLOWCELL[@RUNID8]` on the command line or a row in <library>/links.tsv'
+metrics:
+- id: sc_input_reads
+  name: Input reads
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Reads handed to the single-cell workflow after the basecaller's quality filter.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: <alias>/config_stats.json
+    field: reads
+  - pipeline: wf-single-cell
+    kind: data
+    file: the adapter statistics file named by params.json `adapter_stats`
+    field: the same keys as config_stats.json, when the file is kept
+  - pipeline: wf-single-cell
+    kind: html_table
+    file: wf-single-cell-report.html
+    field: table under 'Experiment summary', row 'Input reads'
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: reads.input
+  chart: first bar of the read funnel; headline tile
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Input reads
+    short_label: Input reads
+- id: sc_full_length_reads
+  name: Full-length reads
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: 'Reads (or read segments) flanked by both adapters in the expected orientation: adapter1 - cDNA - adapter2. Only
+    these are analysed when full_length_only is on.'
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: <alias>/config_stats.json
+    field: full_length
+  - pipeline: wf-single-cell
+    kind: html_table
+    file: wf-single-cell-report.html
+    field: table under 'Read assignment summary', column 'Full length', row 'count'
+  formula: value as given. Can exceed sc_input_reads when concatenated reads are split into several segments.
+  aggregate:
+    type: scalar
+    key: reads.full_length
+  chart: funnel bar
+  thresholds: null
+  threshold_basis: gated through sc_full_length_fraction
+  display:
+    label: Full-length reads
+    short_label: Full length
+- id: sc_full_length_fraction
+  name: Full-length rate
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of input reads that have the complete adapter pair. Low values point to a library-prep problem (fragmented
+    cDNA, adapter dimers, chimeras).
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: derived
+    field: sc_full_length_reads / sc_input_reads
+  formula: min(1, full_length / input)
+  aggregate:
+    type: scalar
+    key: reads.full_length_fraction
+  chart: headline tile; hub column
+  thresholds:
+    direction: low_is_bad
+    warn: 0.8
+    fail: 0.6
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Full-length rate
+    short_label: Full length %
+- id: sc_adapter_config_counts
+  name: Adapter configuration
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: 'How many reads fall into each adapter layout: full length, single adapter1, single adapter2, double adapter1,
+    double adapter2, no adapters, other.'
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: <alias>/config_stats.json
+    field: full_length, single_adapter1, single_adapter2, double_adapter1, double_adapter2, no_adapters, other
+  - pipeline: wf-single-cell
+    kind: embedded_json
+    file: wf-single-cell-report.html
+    field: 'Bokeh figure with axis ''Primer configuration'': columns `groups` and `<alias>` (percent of input reads)'
+  formula: counts as given; when only percentages exist, counts = round(pct / 100 * sc_input_reads) and the bundle flags
+    them as reconstructed
+  aggregate:
+    type: counts
+    key: reads.adapter_config
+  chart: single horizontal stacked bar, full_length first; table on hover
+  thresholds: null
+  threshold_basis: gated through sc_full_length_fraction
+  display:
+    label: Adapter configuration
+    short_label: Adapter layout
+- id: sc_strand_plus_fraction
+  name: Plus-strand share
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of stranded reads sequenced in the plus orientation. cDNA is read from either end at random, so this sits
+    near one half; a value far from it means reads were lost on one side.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: <alias>/config_stats.json
+    field: plus, minus
+  formula: plus / (plus + minus)
+  aggregate:
+    type: scalar
+    key: reads.plus_fraction
+  chart: small text under the adapter bar
+  thresholds:
+    direction: outside_is_bad
+    warn_low: 0.35
+    warn_high: 0.65
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Plus-strand share
+    short_label: Plus strand %
+- id: sc_valid_barcode_reads
+  name: Reads with a valid barcode
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Full-length reads whose barcode was matched to a known cell, spot or square.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: <alias>/read_tags.tsv | <alias>/<alias>.read_summary.tsv
+    field: row count (every row has a corrected_barcode)
+  - pipeline: wf-single-cell
+    kind: html_table
+    file: wf-single-cell-report.html
+    field: '''Read assignment summary'', column ''Valid barcode'''
+  formula: number of data rows with corrected_barcode != '-'
+  aggregate:
+    type: scalar
+    key: reads.valid_barcode
+  chart: funnel bar
+  thresholds: null
+  threshold_basis: gated through sc_valid_barcode_fraction
+  display:
+    label: Reads with a valid barcode
+    short_label: Valid barcode
+- id: sc_valid_barcode_fraction
+  name: Valid barcode rate
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of full-length reads that could be assigned to a cell, spot or square. For droplet data this is also the
+    share of reads in called cells.
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: derived
+    field: sc_valid_barcode_reads / sc_full_length_reads
+  formula: valid_barcode / full_length
+  aggregate:
+    type: scalar
+    key: reads.valid_barcode_fraction
+  chart: headline tile; hub column
+  thresholds:
+    direction: low_is_bad
+    warn: 0.7
+    fail: 0.5
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Valid barcode rate
+    short_label: Valid barcodes %
+- id: sc_valid_umi_fraction
+  name: Valid UMI rate
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of barcoded reads that also have a usable UMI.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: read summary TSV
+    field: corrected_umi
+  formula: rows with corrected_umi != '-' / rows
+  aggregate:
+    type: scalar
+    key: reads.valid_umi_fraction
+  chart: row in the read-assignment table
+  thresholds:
+    direction: low_is_bad
+    warn: 0.85
+    fail: null
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Valid UMI rate
+    short_label: Valid UMIs %
+- id: sc_gene_assigned_reads
+  name: Reads assigned to a gene
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Barcoded reads that the workflow assigned to an annotated gene.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: read summary TSV
+    field: gene
+  - pipeline: wf-single-cell
+    kind: html_table
+    file: wf-single-cell-report.html
+    field: '''Read assignment summary'', column ''Gene assigned'''
+  formula: rows with gene != '-'
+  aggregate:
+    type: scalar
+    key: reads.gene_assigned
+  chart: funnel bar
+  thresholds: null
+  threshold_basis: gated through sc_gene_assigned_fraction
+  display:
+    label: Reads assigned to a gene
+    short_label: Gene assigned
+- id: sc_gene_assigned_fraction
+  name: Gene assignment rate
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of full-length reads that end up counted for a gene. This is the usable fraction of the library for gene
+    expression.
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: derived
+    field: sc_gene_assigned_reads / sc_full_length_reads
+  formula: gene_assigned / full_length
+  aggregate:
+    type: scalar
+    key: reads.gene_assigned_fraction
+  chart: headline tile; hub column
+  thresholds:
+    direction: low_is_bad
+    warn: 0.55
+    fail: 0.4
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Gene assignment rate
+    short_label: Gene assigned %
+- id: sc_transcript_assigned_reads
+  name: Reads assigned to a transcript
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Barcoded reads assigned to one specific isoform. This is what long reads add over short reads.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: read summary TSV
+    field: transcript
+  - pipeline: wf-single-cell
+    kind: html_table
+    file: wf-single-cell-report.html
+    field: '''Read assignment summary'', column ''Transcript assigned'''
+  formula: rows with transcript != '-'
+  aggregate:
+    type: scalar
+    key: reads.transcript_assigned
+  chart: funnel bar
+  thresholds: null
+  threshold_basis: gated through sc_transcript_assigned_fraction
+  display:
+    label: Reads assigned to a transcript
+    short_label: Isoform assigned
+- id: sc_transcript_assigned_fraction
+  name: Transcript assignment rate
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of full-length reads resolved to an isoform.
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: derived
+    field: sc_transcript_assigned_reads / sc_full_length_reads
+  formula: transcript_assigned / full_length
+  aggregate:
+    type: scalar
+    key: reads.transcript_assigned_fraction
+  chart: row in the read-assignment table; hub column (hidden by default)
+  thresholds:
+    direction: low_is_bad
+    warn: 0.2
+    fail: null
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Transcript assignment rate
+    short_label: Transcript %
+- id: sc_read_funnel
+  name: Read fate
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Where the reads go, from the flow cell to unique molecules.
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: derived
+    field: linked run bundles (reads sequenced, reads basecalled pass) + sc_input_reads, sc_full_length_reads, sc_valid_barcode_reads,
+      sc_gene_assigned_reads, sc_transcript_assigned_reads, sc_unique_molecules
+  formula: ordered stages; the two run-level stages are the sum over linked runs and are omitted when a link is unresolved
+    or a run feeds several analyses
+  aggregate:
+    type: funnel
+    key: reads.funnel
+  chart: horizontal funnel, each bar labelled with count and percent of the previous stage
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Read fate
+    short_label: Read fate
+- id: sc_reads_chrm_fraction
+  name: Mitochondrial read share
+  group: reads
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of aligned reads that map to the mitochondrial genome. High values mean stressed or dying cells, or free
+    mitochondrial RNA.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: tagged.bam.bai (index statistics)
+    field: mapped count of chrM / sum of mapped counts
+  - pipeline: spaceranger
+    kind: data
+    file: outs/possorted_genome_bam.bam.bai
+    field: same
+  formula: idxstats[chrM|MT].mapped / sum(idxstats.mapped). Reads the index only (0.07 s).
+  aggregate:
+    type: scalar
+    key: reads.chrm_fraction
+  chart: tile in the mitochondrial panel
+  thresholds:
+    direction: high_is_bad
+    warn: 0.25
+    fail: null
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Mitochondrial read share
+    short_label: chrM reads %
+- id: sc_barcodes_detected
+  name: Barcodes with reads
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: count
+  meaning: Distinct cell barcodes, spots or 8 um bins that received at least one read.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: read summary TSV
+    field: corrected_barcode
+  - pipeline: wf-single-cell
+    kind: html_table
+    file: wf-single-cell-report.html
+    field: '''Experiment summary'', row ''8 um bins with data'''
+  formula: number of distinct corrected_barcode values; for Visium HD the 2 um name s_002um_RRRRR_CCCCC is first mapped
+    to its 8 um bin (R // 4, C // 4)
+  aggregate:
+    type: scalar
+    key: barcodes.detected
+  chart: x-extent of the knee plot; tile
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Barcodes with reads
+    short_label: Units with reads
+- id: sc_cells
+  name: Cells / spots / bins in the matrix
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: count
+  meaning: 'Droplet data: cells called by the workflow. Visium: spots with data. Visium HD: 8 um bins with data. The label
+    changes with the assay.'
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: <alias>/whitelist.tsv
+    field: line count
+  - pipeline: wf-single-cell
+    kind: data
+    file: gene_raw_feature_bc_matrix[_8um]/matrix.mtx.gz
+    field: second number of the size line
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: barcodes.cells
+  chart: headline tile; hub column 'Cells / spots'
+  thresholds:
+    direction: low_is_bad
+    warn: below 50 % of params.json expected_cells (droplet only)
+    fail: null
+  threshold_basis: FlowCellar rule (provisional)
+  display:
+    label: Cells / spots / bins in the matrix
+    short_label: Units
+- id: sc_knee_curve
+  name: Barcode rank plot
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Barcodes sorted by read count. Real cells form a plateau, empty droplets a tail; the drop between them is the
+    knee. For spatial data it shows how evenly reads cover the tissue.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: read summary TSV
+    field: reads per corrected_barcode
+  - pipeline: spaceranger
+    kind: data
+    file: outs/raw_feature_bc_matrix.h5 (Visium) | outs/binned_outputs/square_008um/raw_feature_bc_matrix.h5
+    field: UMIs per barcode = reduceat(matrix/data, matrix/indptr)
+  - pipeline: wf-single-cell
+    kind: embedded_json
+    file: wf-single-cell-report.html
+    field: Bokeh figure with axes 'Read count' / '8 um bin barcode rank' (10,000 points)
+  formula: 'sort counts descending; keep the value at <= 200 log-spaced ranks (rank 1 and the last rank always kept). Spatial
+    assays with a tissue mask store two curves: under tissue and off tissue.'
+  aggregate:
+    type: rank_curve
+    key: barcodes.knee
+  chart: log-log line; droplet data adds the cell-calling threshold as a vertical line; spatial data draws the two tissue
+    classes in two colours
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Barcode rank plot
+    short_label: Barcode rank
+- id: sc_cell_threshold
+  name: Cell-calling threshold
+  group: barcodes
+  applies_to:
+  - singlecell
+  unit: reads
+  meaning: Read count above which a barcode is called a cell.
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: params.json (expected_cells, estimate_cell_count) + read summary TSV
+    field: 'recomputed with the rule in the ONT documentation: 95th percentile of the read counts of the top expected_cells
+      barcodes, divided by 20'
+  formula: see field
+  aggregate:
+    type: scalar
+    key: barcodes.cell_threshold
+  chart: vertical line on the knee plot
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Cell-calling threshold
+    short_label: Cell threshold
+- id: sc_reads_per_cell_mean
+  name: Mean reads per cell / spot / bin
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: 'Sequencing depth per cell: input reads divided by the number of cells (or spots, or 8 um bins with data).'
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: derived
+    field: sc_input_reads / sc_barcodes_detected (spatial) or / sc_cells (droplet)
+  formula: see field
+  aggregate:
+    type: scalar
+    key: barcodes.reads_per_cell_mean
+  chart: headline tile; hub column
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Mean reads per cell / spot / bin
+    short_label: Reads / unit
+- id: sc_reads_per_barcode
+  name: Reads per barcode
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Distribution of barcoded reads over cells, spots or bins.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: read summary TSV
+    field: count of rows per corrected_barcode
+  - pipeline: spaceranger
+    kind: data
+    file: outs/molecule_info.h5
+    field: sum of `count` per `barcode_idx`
+  formula: histogram on bins.log_counts_8_per_decade, plus median, mean, p10, p90
+  aggregate:
+    type: hist
+    key: barcodes.reads_hist
+  chart: histogram, log x
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Reads per barcode
+    short_label: Reads / unit
+- id: sc_umis_per_barcode
+  name: UMIs per cell / spot / bin
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: umis
+  meaning: Unique molecules captured per cell, spot or bin. The basic measure of how much RNA each unit yielded.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: gene_raw_feature_bc_matrix[_8um]/matrix.mtx.gz
+    field: column sums (streamed triplets)
+  - pipeline: spaceranger
+    kind: data
+    file: raw_feature_bc_matrix.h5 | binned_outputs/square_008um/filtered_feature_bc_matrix.h5
+    field: reduceat(matrix/data, matrix/indptr)
+  formula: histogram on bins.log_counts_8_per_decade over barcodes with at least one UMI; scalars median, mean, p10, p90.
+    Spatial assays with a tissue mask compute the scalars over barcodes under tissue.
+  aggregate:
+    type: hist
+    key: barcodes.umis_hist
+  chart: histogram, log x, median marked; headline tile 'Median UMIs'; hub column
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: UMIs per cell / spot / bin
+    short_label: UMIs
+- id: sc_genes_per_barcode
+  name: Genes per cell / spot / bin
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: genes
+  meaning: Distinct genes detected per cell, spot or bin.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: gene_raw_feature_bc_matrix[_8um]/matrix.mtx.gz
+    field: number of entries per column
+  - pipeline: spaceranger
+    kind: data
+    file: raw_feature_bc_matrix.h5 | binned_outputs/square_008um/filtered_feature_bc_matrix.h5
+    field: diff(matrix/indptr)
+  formula: histogram on bins.log_counts_8_per_decade; scalars median, mean, p10, p90 (under tissue when a mask exists)
+  aggregate:
+    type: hist
+    key: barcodes.genes_hist
+  chart: histogram, log x, median marked; headline tile 'Median genes'; hub column
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Genes per cell / spot / bin
+    short_label: Genes
+- id: sc_total_genes_detected
+  name: Genes detected
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: genes
+  meaning: Genes with at least one count anywhere in the sample.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: gene_raw_feature_bc_matrix[_8um]/matrix.mtx.gz
+    field: first number of the size line (the workflow drops all-zero genes when matrix_min_cells >= 1)
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: barcodes.genes_detected
+  chart: tile
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Genes detected
+    short_label: Genes detected
+- id: sc_total_transcripts_detected
+  name: Isoforms detected
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: count
+  meaning: Distinct transcripts with at least one count.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: transcript_raw_feature_bc_matrix[_8um]/matrix.mtx.gz
+    field: first number of the size line
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: barcodes.transcripts_detected
+  chart: tile
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Isoforms detected
+    short_label: Isoforms
+- id: sc_unique_molecules
+  name: Unique molecules
+  group: barcodes
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: umis
+  meaning: 'Total gene-assigned unique molecules: the size of the count matrix.'
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: gene_raw_feature_bc_matrix[_8um]/matrix.mtx.gz
+    field: sum of all values
+  - pipeline: spaceranger
+    kind: data
+    file: outs/molecule_info.h5
+    field: length of `count`
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: barcodes.unique_molecules
+  chart: last bar of the funnel
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Unique molecules
+    short_label: Molecules
+- id: sc_saturation
+  name: Sequencing saturation (ONT workflow)
+  group: saturation
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: 'Share of gene-assigned reads that are repeat observations of a molecule already seen. Near 0: sequencing deeper
+    finds new molecules with almost every read. Near 1: little left to find.'
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: gene_raw_feature_bc_matrix[_8um]/matrix.mtx.gz + read summary TSV
+    field: sc_unique_molecules and sc_gene_assigned_reads
+  - pipeline: wf-single-cell
+    kind: embedded_json
+    file: wf-single-cell-report.html
+    field: Bokeh figure titled 'Sequencing saturation', first point; stored separately as `saturation.reported` because
+      its denominator is all valid-barcode reads
+  formula: 1 - sc_unique_molecules / sc_gene_assigned_reads. The sum of the raw gene matrix IS the number of distinct (barcode,
+    gene, UMI) among gene-assigned reads, so no de-duplication pass is needed.
+  aggregate:
+    type: scalar
+    key: saturation.value
+  chart: headline tile; point at the end of the saturation curve; hub column
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Sequencing saturation (ONT workflow)
+    short_label: Saturation
+- id: sc_reads_per_molecule_hist
+  name: Reads per molecule
+  group: saturation
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: count
+  meaning: How many molecules were seen once, twice, three times and so on. The whole saturation curve follows from this
+    one histogram.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/molecule_info.h5
+    field: bincount(count)
+  - pipeline: flowcellar
+    kind: data
+    file: read summary TSV
+    field: rows per (corrected_barcode, corrected_umi, gene) among gene-assigned rows; needs the de-duplicating variant
+      of the read pass
+  formula: h[c] = number of molecules seen c times, on bins.reads_per_molecule. Rows are grouped by chromosome and a
+    key cannot recur on another chromosome, so the de-duplication runs one chromosome at a time with memory bounded by the
+    largest chromosome.
+  aggregate:
+    type: hist
+    key: saturation.reads_per_molecule
+  chart: not drawn directly; feeds sc_saturation_curve
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Reads per molecule
+    short_label: Reads / molecule
+- id: sc_saturation_curve
+  name: Saturation curve
+  group: saturation
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Saturation as a function of sequencing depth, so the user can see whether more sequencing is worth it.
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: derived
+    field: sc_reads_per_molecule_hist
+  formula: 'for a depth fraction p: saturation(p) = 1 - sum_c h[c] * (1 - (1 - p)**c) / (p * sum_c c * h[c]). Exact expectation
+    under random subsampling; computed in the viewer, nothing extra stored.'
+  aggregate:
+    type: curve
+    key: derived in the viewer from saturation.reads_per_molecule
+  chart: 'line, x = reads, y = saturation, current depth marked; second line: unique molecules against reads'
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Saturation curve
+    short_label: Saturation curve
+- id: sc_mito_fraction_per_barcode
+  name: Mitochondrial fraction per cell / spot / bin
+  group: mito
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of each cell's UMIs that come from mitochondrial genes. High values mark damaged cells or necrotic tissue.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: gene.expression.mito-per-cell.tsv | <alias>.gene_expression_mito_per_cell.tsv
+    field: mito_pct / 100
+  - pipeline: spaceranger
+    kind: data
+    file: raw_feature_bc_matrix.h5
+    field: UMIs of features whose name starts with the mito prefix / UMIs, per barcode
+  formula: histogram on bins.fraction_50; scalars median, p90. Mito prefix from params.json `mito_prefix` (default MT-),
+    matched case-insensitively.
+  aggregate:
+    type: hist
+    key: mito.fraction_hist
+  chart: histogram, median marked; tile 'Median mito %'; hub column
+  thresholds:
+    direction: high_is_bad
+    warn: 0.25
+    fail: null
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Mitochondrial fraction per cell / spot / bin
+    short_label: Mito %
+- id: sc_mito_umi_fraction
+  name: Mitochondrial UMI share
+  group: mito
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of all UMIs in the sample that come from mitochondrial genes.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: gene_raw_feature_bc_matrix[_8um]/matrix.mtx.gz + features.tsv.gz
+    field: sum over MT- features / sum of all
+  - pipeline: spaceranger
+    kind: data
+    file: outs/feature_slice.h5
+    field: sum of feature_slices/<i>/data for MT- features / sum of umis/total/data
+  formula: see field
+  aggregate:
+    type: scalar
+    key: mito.umi_fraction
+  chart: tile
+  thresholds: null
+  threshold_basis: shown beside sc_mito_fraction_per_barcode
+  display:
+    label: Mitochondrial UMI share
+    short_label: Mito UMIs %
+- id: sp_units_under_tissue
+  name: Spots / bins under tissue
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: count
+  meaning: 'Capture units covered by tissue. Visium: spots. Visium HD: 2 um squares, 8 um bins and 16 um bins.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Number of Spots Under Tissue
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Number of Squares Under Tissue 2 µm | Number of Bins Under Tissue 8 µm | Number of Bins Under Tissue 16 µm
+  formula: 'value as given; cross-check: count of in_tissue == 1 in tissue_positions, or sum of masks/filtered in feature_slice.h5'
+  aggregate:
+    type: scalar
+    key: spatial.units_under_tissue
+  chart: headline tile; hub column 'Cells / spots'
+  thresholds:
+    direction: low_is_bad
+    warn: fewer than 100 spots (Visium)
+    fail: 0
+  threshold_basis: FlowCellar rule (provisional)
+  display:
+    label: Spots / bins under tissue
+    short_label: Under tissue
+- id: sp_fraction_under_tissue
+  name: Capture area under tissue
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of the capture area covered by tissue.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Fraction of Spots Under Tissue
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Fraction of Bins Under Tissue 8 µm
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: spatial.fraction_under_tissue
+  chart: tile; drawn as the tissue outline on the map
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Capture area under tissue
+    short_label: Area under tissue
+- id: sp_fraction_reads_under_tissue
+  name: Reads under tissue
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: 'Share of usable reads whose barcode lies under tissue. The rest landed on bare slide: RNA that leaked out of
+    the tissue, or a tissue outline drawn too tight.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Fraction Reads in Spots Under Tissue
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Fraction Reads in Squares Under Tissue
+  formula: 'value as given. Reproducible from molecule_info.h5: sum(count for barcodes under tissue) / sum(count).'
+  aggregate:
+    type: scalar
+    key: spatial.fraction_reads_under_tissue
+  chart: headline tile; hub column
+  thresholds:
+    direction: low_is_bad
+    warn: 0.5
+    fail: 0.3
+  threshold_basis: the pipeline's own alarm limit; a fail level, where given, is a provisional default
+  display:
+    label: Reads under tissue
+    short_label: Under tissue %
+- id: sp_fraction_umis_under_tissue
+  name: UMIs under tissue
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of unique molecules that lie under tissue.
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: raw_feature_bc_matrix.h5 + tissue_positions.csv (Visium) | feature_slice.h5 umis/total + masks/filtered (Visium
+      HD)
+    field: UMIs in units under tissue / all UMIs
+  formula: see field
+  aggregate:
+    type: scalar
+    key: spatial.fraction_umis_under_tissue
+  chart: tile next to sp_fraction_reads_under_tissue
+  thresholds: null
+  threshold_basis: shown
+  display:
+    label: UMIs under tissue
+    short_label: UMIs under tissue
+- id: sp_reads_per_unit_under_tissue
+  name: Mean reads per spot / bin under tissue
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Sequencing depth per capture unit under tissue.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: 'Mean Reads Under Tissue per Spot (also: Mean Reads per Spot)'
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Mean Reads Under Tissue per Bin 8 µm
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: spatial.reads_per_unit
+  chart: tile; hub column
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Mean reads per spot / bin under tissue
+    short_label: Reads / unit
+- id: sp_genes_per_unit
+  name: Genes per spot / bin under tissue
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: genes
+  meaning: 'Visium: median genes per spot under tissue. Visium HD: mean genes per 8 um bin under tissue.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Median Genes per Spot
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Mean Genes Under Tissue per Bin 8 µm
+  formula: 'value as given (note median for Visium, mean for Visium HD: the label says which)'
+  aggregate:
+    type: scalar
+    key: spatial.genes_per_unit
+  chart: headline tile; hub column 'Genes'
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Genes per spot / bin under tissue
+    short_label: Genes
+- id: sp_umis_per_unit
+  name: UMIs per spot / bin under tissue
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: umis
+  meaning: 'Visium: median UMIs per spot under tissue. Visium HD: mean UMIs per 8 um bin under tissue.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Median UMI Counts per Spot
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Mean UMIs Under Tissue per Bin 8 µm
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: spatial.umis_per_unit
+  chart: headline tile; hub column 'UMIs'
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: UMIs per spot / bin under tissue
+    short_label: UMIs
+- id: sp_bin_level_table
+  name: Visium HD bin-level summary
+  group: spatial
+  applies_to:
+  - visium_hd
+  unit: table
+  meaning: 'The same four numbers at each resolution: 2 um squares, 8 um bins, 16 um bins.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: 'for S in {Square 2 µm, Bin 8 µm, Bin 16 µm}: Number of ... Under Tissue S; Mean Reads Under Tissue per S; Fraction
+      of ... Under Tissue S; Mean Genes Under Tissue per S; Mean UMIs Under Tissue per S; Total Genes Detected Under Tissue
+      S'
+  formula: values as given, one row per bin size
+  aggregate:
+    type: table
+    key: spatial.bin_levels
+  chart: '3-row table: bin size, units under tissue, reads, UMIs, genes per unit'
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Visium HD bin-level summary
+    short_label: Bin sizes
+- id: sp_density_per_mm2
+  name: UMIs and reads per mm2 of tissue
+  group: spatial
+  applies_to:
+  - visium_hd
+  unit: per mm2
+  meaning: Molecules and reads per square millimetre of tissue. Comparable between sections of different size.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: UMIs per sq mm of Tissue; Reads per sq mm of Tissue
+  formula: values as given
+  aggregate:
+    type: scalar
+    key: spatial.umis_per_mm2
+  chart: two tiles; hub column 'UMIs / mm2'
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: UMIs and reads per mm2 of tissue
+    short_label: UMIs / mm²
+- id: sp_total_genes_detected
+  name: Genes detected under tissue
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: genes
+  meaning: Genes with at least one count under tissue.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Total Genes Detected
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: spatial.genes_detected
+  chart: tile
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Genes detected under tissue
+    short_label: Genes detected
+- id: sp_map
+  name: Spatial QC map
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: grid
+  meaning: 'A picture of the capture area: where the molecules are, where the tissue is, and whether they agree.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/feature_slice.h5
+    field: umis/total, reads/sequenced, masks/filtered, images/microscope, feature_slices of MT- features; genes from binned_outputs/square_008um/filtered_feature_bc_matrix.h5
+      matrix/indptr
+  - pipeline: spaceranger
+    kind: data
+    file: outs/raw_feature_bc_matrix.h5 + outs/molecule_info.h5 + outs/spatial/tissue_positions.csv
+    field: per-spot UMIs, genes, mito, reads; in_tissue, array_row, array_col
+  - pipeline: wf-single-cell
+    kind: data
+    file: gene_raw_feature_bc_matrix_8um/ (barcodes carry row and column)
+    field: per-bin UMIs and genes; no tissue mask, no image
+  formula: 'Visium HD: rebin the 2 um grid by an integer factor (default 32, i.e. 64 um bins, 105 x 105). Channels: umis
+    (sum, log1p scale), saturation (1 - umis/reads), tissue (fraction of squares under tissue), genes (mean genes per 8
+    um bin), mito (MT- UMIs / UMIs), image (mean grey level of the registered microscope image). Visium: one value per spot
+    in (array_row, array_col) order, no rebinning. Every channel is quantised to uint8 (254 levels, 255 = no data), deflated
+    and base64-encoded.'
+  aggregate:
+    type: grid
+    key: spatial.map
+  chart: canvas heat map with a channel switcher, tissue outline overlay and hover read-out; Visium draws hexagonally packed
+    discs
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Spatial QC map
+    short_label: Spatial map
+- id: sp_segmentation_summary
+  name: Cell segmentation summary
+  group: spatial
+  applies_to:
+  - visium_hd
+  unit: table
+  meaning: 'When Space Ranger segmented cells: how many, how much of the data they hold, and how big they are.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Number of Cells; Reads in Cells; UMIs in Cells; Mean Reads per Cell; Median Genes per Cell; Median UMIs per Cell;
+      Median Cell Area (μm²); Median Nucleus Area (μm²)
+  formula: values as given
+  aggregate:
+    type: table
+    key: spatial.segmentation
+  chart: 'tile row: cells, UMIs in cells, median genes per cell, median cell area'
+  thresholds:
+    direction: low_is_bad
+    warn: UMIs in Cells below 0.50
+    fail: null
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Cell segmentation summary
+    short_label: Cells
+- id: sp_registration
+  name: Image registration
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: table
+  meaning: How the tissue image was aligned to the capture area, and whether the automatic UMI-to-image check agreed.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: metrics_summary_json.json
+    field: tissue_registration_type, hd_layout_offset.{x_offset, y_offset, gaussian_fit_x_offset, gaussian_fit_y_offset,
+      has_gaussian_fit_failed, is_gaussian_fit_outside_range}
+  - pipeline: spaceranger
+    kind: embedded_json
+    file: outs/web_summary.html
+    field: sample table rows 'Loupe Manual Alignment', 'Image Reorientation'; `diagnostics.hd_layout_offset`
+  formula: values as given
+  aggregate:
+    type: table
+    key: spatial.registration
+  chart: 'two-line text block under the map: manual or automatic alignment, alignment file name, applied offset, fitted
+    offset'
+  thresholds:
+    direction: flag
+    warn: is_gaussian_fit_outside_range or has_gaussian_fit_failed is true
+    fail: null
+  threshold_basis: the pipeline's own flags
+  display:
+    label: Image registration
+    short_label: Image alignment
+- id: sp_pipeline_alarms
+  name: Pipeline alarms
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: messages
+  meaning: Warnings and errors raised by Space Ranger itself, shown word for word.
+  sources:
+  - pipeline: spaceranger
+    kind: embedded_json
+    file: outs/web_summary.html
+    field: 'alarms.alarms[]: level, title, formatted_value, message'
+  - pipeline: spaceranger
+    kind: embedded_json
+    file: outs/web_summary.html
+    field: 'summary.alarms.alarms[]: level, title, raw_value, formatted_value, message, id'
+  formula: copied; level WARN -> status warn, level ERROR -> status fail
+  aggregate:
+    type: messages
+    key: spatial.alarms
+  chart: list at the top of the analysis view, each with level badge, title, value and the pipeline's message
+  thresholds:
+    direction: flag
+    warn: any WARN
+    fail: any ERROR
+  threshold_basis: the pipeline vendor's own alarm logic and limits for that chemistry and version
+  display:
+    label: Pipeline alarms
+    short_label: Alarms
+- id: sp_wf_sr_umi_ratio
+  name: ONT workflow to Space Ranger UMI ratio
+  group: spatial
+  applies_to:
+  - visium
+  - visium_hd
+  unit: ratio
+  meaning: 'The same reads counted two ways: full-length long-read analysis against the short-read-style analysis. A large
+    gap means one of the two pipelines is losing reads.'
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: derived
+    field: sc_unique_molecules (wf-single-cell) / sc_unique_molecules (Space Ranger), only when the two analyses are siblings
+  formula: see field
+  aggregate:
+    type: scalar
+    key: spatial.wf_sr_umi_ratio
+  chart: 'one line in the concordance box: both totals and the ratio'
+  thresholds:
+    direction: outside_is_bad
+    warn_low: 0.5
+    warn_high: 2.0
+  threshold_basis: FlowCellar rule (provisional)
+  display:
+    label: ONT workflow to Space Ranger UMI ratio
+    short_label: Molecule ratio
+- id: sr_number_of_reads
+  name: Reads (Space Ranger)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: reads
+  meaning: Read pairs Space Ranger received. With ONT data these are the synthetic read pairs built from the long reads.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Number of Reads
+  formula: value as given (equals molecule_info metrics_json libraries.0.raw_read_pairs and mapped + unmapped in the BAM
+    index)
+  aggregate:
+    type: scalar
+    key: sr.reads
+  chart: tile; first bar of the Space Ranger funnel
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Reads (Space Ranger)
+    short_label: Reads
+- id: sr_usable_reads_fraction
+  name: Usable reads (Space Ranger)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of reads that survive every Space Ranger filter and are counted under tissue. One number for the efficiency
+    of the whole experiment.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/molecule_info.h5
+    field: metrics_json libraries.<n>.usable_read_pairs / raw_read_pairs (also feature_read_pairs)
+  formula: sum over libraries of usable_read_pairs / sum of raw_read_pairs; funnel = raw -> feature -> usable
+  aggregate:
+    type: funnel
+    key: sr.read_funnel
+  chart: three-bar funnel; headline tile; hub column 'Usable %'
+  thresholds:
+    direction: low_is_bad
+    warn: 0.3
+    fail: 0.1
+  threshold_basis: provisional default, set well below the values of good libraries; a laboratory adjusts it in its configuration
+  display:
+    label: Usable reads (Space Ranger)
+    short_label: Usable %
+- id: sr_valid_barcodes
+  name: Valid barcodes (Space Ranger)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of reads whose barcode matches the slide's barcode list after correction.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Valid Barcodes
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: sr.valid_barcodes
+  chart: tile; hub column
+  thresholds:
+    direction: low_is_bad
+    warn: 0.75
+    fail: 0.5
+  threshold_basis: vendor convention (to be confirmed against the vendor's technical note before a release); a fail level,
+    where given, is a provisional default
+  display:
+    label: Valid barcodes (Space Ranger)
+    short_label: Valid barcodes %
+- id: sr_valid_umis
+  name: Valid UMIs (Space Ranger)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of reads with a usable UMI.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Valid UMIs
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Valid UMI Sequences
+  formula: value as given (column name changed between versions)
+  aggregate:
+    type: scalar
+    key: sr.valid_umis
+  chart: table row
+  thresholds:
+    direction: low_is_bad
+    warn: 0.75
+    fail: null
+  threshold_basis: FlowCellar rule (provisional)
+  display:
+    label: Valid UMIs (Space Ranger)
+    short_label: Valid UMIs %
+- id: sr_sequencing_saturation
+  name: Sequencing saturation (Space Ranger)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: 'Space Ranger''s saturation figure. Not interchangeable with sc_saturation: different read sets and filters.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Sequencing Saturation
+  formula: value as given; equals 1 - len(count) / sum(count) from molecule_info.h5 on Visium HD
+  aggregate:
+    type: scalar
+    key: sr.saturation
+  chart: tile; end point of the Space Ranger saturation curve (sc_saturation_curve fed with the molecule_info histogram)
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Sequencing saturation (Space Ranger)
+    short_label: Saturation
+- id: sr_q30
+  name: Q30 bases (barcode, UMI, RNA read)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of bases with quality 30 or better in the three read parts, as Space Ranger sees them. With nanopore reads
+    these are lower than with Illumina and are context, not a verdict.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Q30 Bases in Barcode; Q30 Bases in UMI; Q30 Bases in RNA Read
+  formula: values as given
+  aggregate:
+    type: counts
+    key: sr.q30
+  chart: three small bars
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Q30 bases (barcode, UMI, RNA read)
+    short_label: Q30
+- id: sr_mapping
+  name: Mapping breakdown (Space Ranger)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: 'Where the reads map: genome, confidently, exonic, intronic, intergenic, transcriptome.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Reads Mapped to Genome; Reads Mapped Confidently to Genome; ... to Intergenic Regions; ... to Intronic Regions;
+      ... to Exonic Regions; ... to Transcriptome
+  formula: values as given
+  aggregate:
+    type: counts
+    key: sr.mapping
+  chart: 'stacked bar: exonic, intronic, intergenic, mapped not confidently, unmapped; separate tick for transcriptome'
+  thresholds:
+    direction: low_is_bad
+    warn: Reads Mapped Confidently to Transcriptome below 0.30
+    fail: null
+  threshold_basis: vendor convention (to be confirmed against the vendor's technical note before a release); a fail level,
+    where given, is a provisional default
+  display:
+    label: Mapping breakdown (Space Ranger)
+    short_label: Mapping
+- id: sr_antisense_fraction
+  name: Reads antisense to genes (Space Ranger)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: Share of reads on the wrong strand of a gene. High values mean the reads were not put into the orientation Space
+    Ranger expects before conversion.
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: outs/metrics_summary.csv
+    field: Reads Mapped Antisense to Gene
+  formula: value as given
+  aggregate:
+    type: scalar
+    key: sr.antisense
+  chart: tile with the limit drawn; hub column (hidden by default)
+  thresholds:
+    direction: high_is_bad
+    warn: 0.1
+    fail: 0.3
+  threshold_basis: the pipeline's own alarm limit; a fail level, where given, is a provisional default
+  display:
+    label: Reads antisense to genes (Space Ranger)
+    short_label: Antisense %
+- id: sr_diagnostics
+  name: Library diagnostics (Space Ranger)
+  group: spaceranger
+  applies_to:
+  - visium
+  - visium_hd
+  unit: fraction
+  meaning: 'Extra library checks: share of barcodes that needed correction, reads carrying template-switch oligo, reads
+    in low-support UMIs.'
+  sources:
+  - pipeline: spaceranger
+    kind: data
+    file: metrics_summary_json.json (only when consistent with metrics_summary.csv)
+    field: corrected_bc_frac, tso_frac, low_support_umi_reads_frac
+  - pipeline: spaceranger
+    kind: embedded_json
+    file: outs/web_summary.html
+    field: 'diagnostics.{corrected_bc_frac, tso_frac, low_support_umi_reads_frac} (3.0.1: summary.diagnostics, no corrected_bc_frac)'
+  formula: values as given
+  aggregate:
+    type: counts
+    key: sr.diagnostics
+  chart: three table rows in the collapsed diagnostics box
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Library diagnostics (Space Ranger)
+    short_label: Diagnostics
+- id: sc_link_runs
+  name: Linked sequencing runs
+  group: link
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: links
+  meaning: The flow cell runs this analysis was made from, with the share of reads from each and how the link was established.
+  sources:
+  - pipeline: flowcellar
+    kind: data
+    file: see link_model.evidence_ladder
+    field: first rung that yields a link
+  formula: see link_model
+  aggregate:
+    type: links
+    key: links
+  chart: 'chips in the analysis header: flow cell id, share, evidence icon; dangling links greyed'
+  thresholds:
+    direction: flag
+    warn: no link, or a link that does not resolve to a run in the library
+    fail: null
+  threshold_basis: FlowCellar rule (provisional)
+  display:
+    label: Linked sequencing runs
+    short_label: Flow cells
+- id: sc_wf_execution
+  name: Workflow execution
+  group: workflow
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: table
+  meaning: Did the workflow finish cleanly, how long did it take and how much memory did it need.
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: execution/trace.txt
+    field: status, exit, submit, realtime, peak_rss, name
+  formula: tasks = rows; failed = rows with status not in {COMPLETED, CACHED} or exit != 0; cpu_hours = sum(realtime); wall
+    = last submit + its duration - first submit; peak_rss = max; top 5 processes by realtime
+  aggregate:
+    type: table
+    key: workflow.execution
+  chart: 'one line: tasks, failed, wall time, task hours, peak memory; expandable top-5 table'
+  thresholds:
+    direction: flag
+    warn: any failed task
+    fail: null
+  threshold_basis: FlowCellar rule (provisional)
+  display:
+    label: Workflow execution
+    short_label: Workflow
+- id: sc_wf_parameters
+  name: Workflow parameters
+  group: workflow
+  applies_to:
+  - singlecell
+  - visium
+  - visium_hd
+  unit: table
+  meaning: 'The settings that change what the numbers mean: kit, full-length only, minimum read quality, barcode edit distance,
+    matrix filters, mitochondrial prefix, expected cells, reference.'
+  sources:
+  - pipeline: wf-single-cell
+    kind: data
+    file: params.json
+    field: kit, full_length_only, min_read_qual, barcode_max_ed, barcode_min_ed_diff, gene_assigns_minqv, matrix_min_genes,
+      matrix_min_cells, matrix_max_mito, mito_prefix, expected_cells, estimate_cell_count, ref_genome_dir
+  - pipeline: wf-single-cell
+    kind: html_table
+    file: wf-single-cell-report.html
+    field: table under 'Workflow parameters'
+  - pipeline: spaceranger
+    kind: data
+    file: _cmdline / _invocation when kept; else web_summary.html command line
+    field: slide, area, image, loupe-alignment, custom-segmentation-file, r2-length, create-bam
+  formula: copied; file-system paths are reduced to their last two components
+  aggregate:
+    type: table
+    key: workflow.parameters
+  chart: collapsed key/value table; a parameter that differs from the workflow default is marked
+  thresholds: null
+  threshold_basis: 'none: shown, never gates the verdict'
+  display:
+    label: Workflow parameters
+    short_label: Parameters
+checks:
+- id: sp_pipeline_alarms
+  role: key
+  kind: rule
+  pipeline: spaceranger
+  ok: Space Ranger raised no alarm.
+  warn: 'Space Ranger alarm, in its own words: "{title}"{value_part}. {message}'
+  fail: 'Space Ranger error, in its own words: "{title}"{value_part}. {message}'
+- id: sc_full_length_fraction
+  role: key
+  kind: min
+  value: reads_full_length_fraction
+  pipeline: wf-single-cell
+  ok: '{value} of the input reads are full length (both adapters, in order).'
+  warn: Only {value} of the input reads are full length (both adapters, in order). Warn below {warn}.
+  fail: Only {value} of the input reads are full length (both adapters, in order). Fail below {fail}.
+- id: sc_strand_plus_fraction
+  role: supporting
+  kind: range
+  value: reads_plus_fraction
+  pipeline: wf-single-cell
+  ok: '{value} of the stranded reads are in plus orientation.'
+  warn: '{value} of the stranded reads are in plus orientation; a value near one half is expected ({lo} to {hi}).'
+- id: sc_valid_barcode_fraction
+  role: key
+  kind: min
+  value: reads_valid_barcode_fraction
+  pipeline: wf-single-cell
+  ok: '{value} of the full-length reads were matched to {a_unit}.'
+  warn: Only {value} of the full-length reads were matched to {a_unit}. Warn below {warn}.
+  fail: Only {value} of the full-length reads were matched to {a_unit}. Fail below {fail}.
+- id: sc_valid_umi_fraction
+  role: supporting
+  kind: min
+  value: reads_valid_umi_fraction
+  pipeline: wf-single-cell
+  ok: '{value} of the barcoded reads have a usable UMI.'
+  warn: Only {value} of the barcoded reads have a usable UMI. Warn below {warn}.
+- id: sc_gene_assigned_fraction
+  role: key
+  kind: min
+  value: reads_gene_assigned_fraction
+  pipeline: wf-single-cell
+  ok: '{value} of the full-length reads were assigned to a gene.'
+  warn: Only {value} of the full-length reads were assigned to a gene. Warn below {warn}.
+  fail: Only {value} of the full-length reads were assigned to a gene. Fail below {fail}.
+- id: sc_transcript_assigned_fraction
+  role: supporting
+  kind: min
+  value: reads_transcript_assigned_fraction
+  pipeline: wf-single-cell
+  ok: '{value} of the full-length reads were resolved to one isoform.'
+  warn: Only {value} of the full-length reads were resolved to one isoform. Warn below {warn}.
+- id: sc_reads_chrm_fraction
+  role: supporting
+  kind: max
+  value: reads_chrm_fraction
+  ok: '{value} of the aligned reads map to the mitochondrial genome.'
+  warn: '{value} of the aligned reads map to the mitochondrial genome. Warn above {warn}.'
+- id: sc_cells
+  role: supporting
+  kind: rule
+  warn_fraction_of_expected: 0.5
+  value: barcodes_cells
+  pipeline: wf-single-cell
+  assays:
+  - singlecell
+  ok: '{value} cells were called ({expected} expected).'
+  warn: Only {value} cells were called, less than half of the {expected} expected.
+- id: sc_mito_fraction_per_barcode
+  role: supporting
+  kind: max
+  value: mito_fraction_median
+  ok: The median mitochondrial share per {unit} is {value}.
+  warn: The median mitochondrial share per {unit} is {value}. Warn above {warn}.
+- id: sp_units_under_tissue
+  role: key
+  kind: rule
+  warn_at: 100
+  warn_assays:
+  - visium
+  fail_at: 1
+  value: spatial_units_under_tissue
+  pipeline: spaceranger
+  ok: '{value} {units} lie under tissue.'
+  warn: Only {value} spots lie under tissue. Warn below {warn}.
+  fail: 'No {unit} lies under tissue: the tissue was not found on the image.'
+- id: sp_fraction_reads_under_tissue
+  role: key
+  kind: min
+  value: spatial_fraction_reads_under_tissue
+  pipeline: spaceranger
+  ok: '{value} of the usable reads lie under tissue.'
+  warn: Only {value} of the usable reads lie under tissue. Warn below {warn}.
+  fail: Only {value} of the usable reads lie under tissue. Fail below {fail}.
+- id: sp_segmentation_summary
+  role: supporting
+  kind: min
+  warn_at: 0.5
+  value: spatial_umis_in_cells
+  pipeline: spaceranger
+  assays:
+  - visium_hd
+  ok: '{value} of the molecules under tissue lie inside segmented cells.'
+  warn: Only {value} of the molecules under tissue lie inside segmented cells. Warn below {warn}.
+- id: sp_registration
+  role: supporting
+  kind: rule
+  pipeline: spaceranger
+  ok: The pipeline's check of molecules against the image found no offset.
+  warn: 'The pipeline''s check of molecules against the image did not agree with the alignment in use: molecules and image
+    may be offset.'
+- id: sr_usable_reads_fraction
+  role: key
+  kind: min
+  value: sr_usable_reads_fraction
+  pipeline: spaceranger
+  ok: '{value} of the reads survive every Space Ranger filter and lie under tissue.'
+  warn: Only {value} of the reads survive every Space Ranger filter and lie under tissue. Warn below {warn}.
+  fail: Only {value} of the reads survive every Space Ranger filter and lie under tissue. Fail below {fail}.
+- id: sr_valid_barcodes
+  role: key
+  kind: min
+  value: sr_valid_barcodes
+  pipeline: spaceranger
+  ok: '{value} of the reads carry a barcode of the slide.'
+  warn: Only {value} of the reads carry a barcode of the slide. Warn below {warn}.
+  fail: Only {value} of the reads carry a barcode of the slide. Fail below {fail}.
+- id: sr_valid_umis
+  role: supporting
+  kind: min
+  value: sr_valid_umis
+  pipeline: spaceranger
+  ok: '{value} of the reads have a usable UMI.'
+  warn: Only {value} of the reads have a usable UMI. Warn below {warn}.
+- id: sr_mapping
+  role: supporting
+  kind: min
+  warn_at: 0.3
+  value: sr_mapped_transcriptome
+  pipeline: spaceranger
+  ok: '{value} of the reads map confidently to the transcriptome.'
+  warn: Only {value} of the reads map confidently to the transcriptome. Warn below {warn}.
+- id: sr_antisense_fraction
+  role: key
+  kind: max
+  value: sr_antisense
+  pipeline: spaceranger
+  ok: '{value} of the reads map antisense to a gene.'
+  warn: '{value} of the reads map antisense to a gene: the reads were probably not oriented before they were given to Space
+    Ranger. Warn above {warn}.'
+  fail: '{value} of the reads map antisense to a gene: the reads were not oriented before they were given to Space Ranger.
+    Fail above {fail}.'
+- id: sp_wf_sr_umi_ratio
+  role: supporting
+  kind: range
+  value: spatial_wf_sr_umi_ratio
+  ok: The ONT workflow counts {value} times the molecules Space Ranger counts from the same reads.
+  warn: The ONT workflow counts {value} times the molecules Space Ranger counts from the same reads; one of the two pipelines
+    is losing reads (expected {lo} to {hi}).
+- id: sc_wf_execution
+  role: supporting
+  kind: rule
+  value: workflow_failed_tasks
+  pipeline: wf-single-cell
+  ok: All {tasks} tasks of the workflow finished.
+  warn: '{value} of the {tasks} tasks of the workflow failed.'
+- id: sc_link_runs
+  role: info
+  kind: rule
+  ok: The reads come from {n} flow cell run{s} of this library.
+  warn_none: 'No flow cell run could be named for this analysis. State it with: flowcellar analysis DIR --run FLOWCELL.'
+  warn_unresolved: '{missing} of the {n} flow cell runs this analysis came from {are} not in the library ({names}).'
+status_rules:
+  roll_up: worst of all metric thresholds that apply to the assay, plus pipeline alarms; every triggered rule is listed
+    as a reason
+  scope: an analysis has its own status. It never changes the pass / warn / fail status of a flow cell run; the run row
+    shows it as a separate badge.
+  missing_data: a metric whose source is absent is 'not available', never a failure; numbers taken from an HTML report are
+    marked
+  overrides: every warn / fail value can be overridden per assay in the library's configuration; the catalogue values are
+    defaults
+size_budget:
+  analysis_section_default_bytes: 150000
+  analysis_section_hard_cap_bytes: 400000
+  hub_index_row: scalars only, at most 1 kB per analysis; no map, no curve
+excluded_on_purpose:
+- 'UMAP coordinates (gene_expression_umap_*.tsv), clustering, differential expression, deconvolution, cell-type annotation:
+  biological analysis, out of scope'
+- 'Fusion transcript tables (ctat-LR-fusion): biological result, not QC'
+- 'Read length and quality histograms of the workflow input: owned by the core''s read-level tier, drawn from the linked
+  run or its basecalled BAM'
+- 'cloupe files, tissue_hires_image.png, geojson segmentations: large, and not needed for any metric'

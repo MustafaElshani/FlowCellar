@@ -1,0 +1,106 @@
+[build-system]
+# 1.27 is the first hatchling that writes the licence as an SPDX expression with licence files (PEP 639).
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flowcellar"
+# The long description is README.md with its paths made into addresses (hatch_build.py): relative paths lead nowhere on PyPI.
+dynamic = ["version", "readme"]
+description = "Quality control for Oxford Nanopore sequencing runs: a library of small per-run bundles and one viewer that works offline."
+# GNU General Public License, version 3 or any later version.
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+requires-python = ">=3.11"
+authors = [{ name = "The FlowCellar authors" }]
+keywords = ["nanopore", "sequencing", "quality control", "MinKNOW", "Dorado", "bioinformatics", "long reads"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+# Run-time dependencies are fixed by the specification (section 7.1). Nothing else may be imported at run time.
+dependencies = ["numpy>=1.26", "pyarrow>=15", "click>=8.1"]
+
+[project.optional-dependencies]
+# pysam reads BAM files (read data). It has no Windows build; run health works without it.
+bam = ["pysam>=0.22; platform_system != 'Windows'"]
+# jsonschema is what `flowcellar validate` checks bundles with.
+validate = ["jsonschema>=4.21"]
+# h5py reads the HDF5 files of Space Ranger (maps, saturation, per-unit numbers) for the single-cell and spatial
+# add-on. Nothing else needs it, and the add-on reads every table and JSON file without it.
+sc = ["h5py>=3.8"]
+all = ["flowcellar[bam,validate,sc]"]
+dev = ["pytest>=8", "jsonschema>=4.21", "PyYAML>=6", "ruff>=0.5", "build>=1.2", "h5py>=3.8"]
+
+[project.urls]
+Homepage = "https://github.com/MustafaElshani/FlowCellar"
+Documentation = "https://github.com/MustafaElshani/FlowCellar/tree/main/docs"
+Changelog = "https://github.com/MustafaElshani/FlowCellar/blob/main/CHANGELOG.md"
+Issues = "https://github.com/MustafaElshani/FlowCellar/issues"
+Source = "https://github.com/MustafaElshani/FlowCellar"
+
+[project.scripts]
+flowcellar = "flowcellar.cli:main"
+
+# The version is a plain string in the package, so it works in a repository without commits or tags.
+# A release sets it to the number of the tag (docs/releasing.md); build.yml refuses a tag that differs.
+[tool.hatch.version]
+path = "src/flowcellar/_version.py"
+
+# hatch_build.py stops a wheel or a source distribution that would lack the built viewer or the catalogue JSON.
+[tool.hatch.build.hooks.custom]
+path = "hatch_build.py"
+
+# ... and writes the long description from README.md.
+[tool.hatch.metadata.hooks.custom]
+path = "hatch_build.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/flowcellar"]
+# viewer_dist/ is built by viewer/build.mjs and git-ignored; "artifacts" ships it all the same.
+artifacts = ["src/flowcellar/viewer_dist/**"]
+
+# The source distribution holds what is needed to build the wheel, rebuild the viewer and run the tests.
+# design/, prototype/ and local/ never go in: they hold a laboratory's own names.
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/flowcellar",
+    "/viewer/src", "/viewer/styles", "/viewer/brand", "/viewer/verify", "/viewer/build.mjs",
+    "/viewer/package.json", "/viewer/package-lock.json", "/viewer/README.md",
+    "/catalogue", "/tools", "/tests", "/docs",
+    "/README.md", "/LICENSE", "/THIRD_PARTY_NOTICES.md", "/CHANGELOG.md", "/pyproject.toml", "/hatch_build.py",
+]
+exclude = [
+    "/design", "/prototype", "/local", "/dist", "/.github", "/.venv",
+    "/viewer/node_modules", "/viewer/pw-browsers", "/viewer/.cache", "/viewer/src/gen",
+    "**/__pycache__", "*.pyc",
+]
+artifacts = ["src/flowcellar/viewer_dist/**"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -ra"
+markers = [
+    "bam: needs pysam (the 'bam' extra)",
+    "viewer: needs the built viewer in src/flowcellar/viewer_dist",
+    "slow: takes more than a few seconds",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+src = ["src", "tests", "tools"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501", "E701", "E702", "B008", "B905", "UP031", "UP035", "UP006"]

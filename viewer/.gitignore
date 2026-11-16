@@ -1,0 +1,7 @@
+node_modules/
+pw-browsers/
+pw-browsers
+.cache/
+.npm-cache/
+src/gen/
+*.log

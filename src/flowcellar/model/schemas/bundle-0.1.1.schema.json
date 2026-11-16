@@ -1,0 +1,3713 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "urn:flowcellar:schema:bundle:0.1.1",
+ "title": "FlowCellar run bundle",
+ "description": "FlowCellar run bundle, schema 0.1.1 (draft; 0.x until FlowCellar 1.0.0). One bundle per MinKNOW protocol run. A bundle file inside a library holds measured content only; status, user and relations are composed into every bundle that leaves the library (report, hub sidecar, flowcellar run without a library).",
+ "type": "object",
+ "required": [
+  "format",
+  "schema_version",
+  "kind",
+  "bundle_id",
+  "identity",
+  "provenance",
+  "tiers",
+  "samples",
+  "axes",
+  "modules"
+ ],
+ "additionalProperties": false,
+ "properties": {
+  "format": {
+   "const": "flowcellar.bundle"
+  },
+  "schema_version": {
+   "description": "Semantic version of this schema. 0.x until FlowCellar 1.0.0: a reader accepts its own 0.x and migrates older ones; a newer one is refused with the command to run. From 1.0.0: readers accept any 1.x.",
+   "type": "string",
+   "pattern": "^0\\.1\\.(0|[1-9]\\d*)$"
+  },
+  "kind": {
+   "description": "run: one MinKNOW protocol run on one flow cell. analysis: the output of a downstream pipeline that pools runs and cannot be split by run; experimental, not written by this version. project: reserved.",
+   "enum": [
+    "run",
+    "analysis",
+    "project"
+   ]
+  },
+  "bundle_id": {
+   "description": "For kind=run this equals identity.run_key. For kind=analysis it is an_{pipeline}_{first 12 hex of identity.analysis.id}. Safe to use as a file name.",
+   "$ref": "#/$defs/safe_id"
+  },
+  "content_sha256": {
+   "description": "SHA-256 of the canonical JSON text (sorted keys, no insignificant whitespace, UTF-8) of this bundle with the members content_sha256, status, user, relations, provenance.created, provenance.updated, provenance.revision and provenance.timings removed. Two computations over the same inputs with the same software give the same value. status is left out because baseline thresholds depend on the other runs in a library.",
+   "$ref": "#/$defs/sha256"
+  },
+  "identity": {
+   "$ref": "#/$defs/identity"
+  },
+  "provenance": {
+   "$ref": "#/$defs/provenance"
+  },
+  "tiers": {
+   "$ref": "#/$defs/tiers"
+  },
+  "samples": {
+   "description": "Every sample known for this run, including the pseudo-sample for unclassified reads. Cube cells refer to samples by key.",
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/sample"
+   }
+  },
+  "axes": {
+   "description": "Definitions of every axis referenced by an aggregate in this bundle, copied from the axis registry so the bundle is self-describing. An axis id is immutable: the same id always means the same bin edges.",
+   "type": "object",
+   "propertyNames": {
+    "$ref": "#/$defs/snake_id"
+   },
+   "additionalProperties": {
+    "$ref": "#/$defs/axis"
+   }
+  },
+  "modules": {
+   "description": "One section per cube. Keys are the module ids of the metric catalogues (run, fc, yield, dyn, len, qual, bc, aln, dup, mod, as, cdna, rna, drna, funnel, sc) or <module>.<part> when a module stores data at a second granularity (yield.basecalled, len.est, funnel.samples, aln.windows, rna.coverage, as.targets). SPEC.md section 5.3 lists every section with its dimensions.",
+   "type": "object",
+   "propertyNames": {
+    "$ref": "#/$defs/module_id"
+   },
+   "additionalProperties": {
+    "$ref": "#/$defs/section"
+   }
+  },
+  "status": {
+   "$ref": "#/$defs/status",
+   "x-composed": true,
+   "description": "COMPOSED member: absent from a bundle file inside a library, present in every exported bundle, report and sidecar."
+  },
+  "user": {
+   "$ref": "#/$defs/user",
+   "x-composed": true,
+   "description": "COMPOSED member: absent from a bundle file inside a library, present in every exported bundle, report and sidecar."
+  },
+  "relations": {
+   "description": "COMPOSED member: absent from a bundle file inside a library, present in every exported bundle, report and sidecar. Links to other bundles in the same library.",
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "analyses": {
+     "description": "kind=run: ids of analysis bundles linked to this run.",
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/safe_id"
+     }
+    },
+    "superseded_by": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "member_runs": {
+     "description": "kind=project: run keys this bundle covers. For kind=analysis use identity.analysis.links.",
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/safe_id"
+     }
+    },
+    "flow_cell_use": {
+     "description": "kind=run. Which loading of its flow cell this run is (metric run_flow_cell_use). An earlier run counts as a loading when it sequenced 2 h or more or produced 2 % or more of the fixed 24 h warning level in estimated bases; a shorter one is a restart of the next loading. Library knowledge, outside content_sha256.",
+     "type": "object",
+     "required": [
+      "index",
+      "source"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "index": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "of": {
+       "description": "Loadings of this flow cell known to the library.",
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 1
+      },
+      "source": {
+       "description": "declared: stated on the command line or in an annotation. library: an earlier loading is in the library. unknown: no library, or no earlier run known; first use is assumed, not established.",
+       "enum": [
+        "declared",
+        "library",
+        "unknown"
+       ]
+      },
+      "prior_runs": {
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 0
+      },
+      "prior_hours": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "prior_estimated_bases": {
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 0
+      },
+      "restart_of": {
+       "description": "Run key of the run whose loading this short start belongs to.",
+       "anyOf": [
+        {
+         "$ref": "#/$defs/safe_id"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "runs": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "run_key"
+        ],
+        "additionalProperties": false,
+        "properties": {
+         "run_key": {
+          "$ref": "#/$defs/safe_id"
+         },
+         "started": {
+          "anyOf": [
+           {
+            "$ref": "#/$defs/datetime"
+           },
+           {
+            "type": "null"
+           }
+          ]
+         },
+         "hours": {
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "estimated_bases": {
+          "type": [
+           "integer",
+           "null"
+          ],
+          "minimum": 0
+         },
+         "pores_first_scan": {
+          "type": [
+           "integer",
+           "null"
+          ],
+          "minimum": 0
+         },
+         "loading": {
+          "type": [
+           "integer",
+           "null"
+          ],
+          "minimum": 1
+         },
+         "restart": {
+          "type": "boolean"
+         }
+        }
+       }
+      }
+     }
+    },
+    "projects": {
+     "description": "Projects this run belongs to, from the library: the path component named by each root's project_depth or project_pattern, for the run folder and for each sample's files. A flow cell can carry two.",
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "$ref": "#/$defs/safe_id"
+       },
+       "name": {
+        "$ref": "#/$defs/name"
+       },
+       "source": {
+        "enum": [
+         "path",
+         "config",
+         "sample_sheet"
+        ]
+       },
+       "roots": {
+        "type": "array",
+        "items": {
+         "$ref": "#/$defs/safe_id"
+        }
+       }
+      }
+     }
+    },
+    "paths": {
+     "description": "Where the library found the run folder: one entry per root it was seen under.",
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "root",
+       "relpath"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "root": {
+        "$ref": "#/$defs/safe_id"
+       },
+       "relpath": {
+        "type": "string"
+       },
+       "seen": {
+        "$ref": "#/$defs/datetime"
+       }
+      }
+     }
+    }
+   },
+   "x-composed": true
+  },
+  "extensions": {
+   "description": "Free-form space for third-party modules and experiments. Readers must ignore it.",
+   "type": "object"
+  }
+ },
+ "allOf": [
+  {
+   "if": {
+    "properties": {
+     "kind": {
+      "const": "run"
+     }
+    }
+   },
+   "then": {
+    "properties": {
+     "identity": {
+      "required": [
+       "run_key",
+       "flow_cell",
+       "protocol_run"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "kind": {
+      "const": "analysis"
+     }
+    }
+   },
+   "then": {
+    "properties": {
+     "identity": {
+      "required": [
+       "analysis"
+      ]
+     }
+    }
+   }
+  }
+ ],
+ "$defs": {
+  "safe_id": {
+   "type": "string",
+   "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$"
+  },
+  "snake_id": {
+   "type": "string",
+   "pattern": "^[a-z][a-z0-9_]{0,63}$"
+  },
+  "module_id": {
+   "description": "Catalogue module id, optionally followed by a part name: len, len.est, yield.basecalled, sc.",
+   "type": "string",
+   "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){0,2}$"
+  },
+  "sha256": {
+   "type": "string",
+   "pattern": "^[0-9a-f]{64}$"
+  },
+  "semver": {
+   "type": "string",
+   "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+  },
+  "datetime": {
+   "description": "RFC 3339 timestamp, always UTC with a Z suffix.",
+   "type": "string",
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,9})?Z$"
+  },
+  "text": {
+   "description": "Untrusted text copied from an input file. Control characters removed, NFC normalised, truncated by the writer. Never interpreted as markup.",
+   "type": "string",
+   "maxLength": 4096
+  },
+  "name": {
+   "type": "string",
+   "maxLength": 256
+  },
+  "nullable_name": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "maxLength": 256
+  },
+  "count": {
+   "type": "integer",
+   "minimum": 0
+  },
+  "number_array": {
+   "type": "array",
+   "items": {
+    "type": [
+     "number",
+     "null"
+    ]
+   }
+  },
+  "count_array": {
+   "type": "array",
+   "items": {
+    "type": "integer",
+    "minimum": 0
+   }
+  },
+  "merge_rule": {
+   "enum": [
+    "sum",
+    "min",
+    "max",
+    "mean",
+    "first",
+    "last",
+    "same"
+   ]
+  },
+  "link_method": {
+   "description": "Evidence ladder, strongest first. run_dir: the file is inside the run folder. bam_header_rg: @RG PU and DS runid. read_tag: the fn or RG tag on the reads. summary_column: run_id and filename_pod5 columns. sample_sheet: flow_cell_id column of a basecaller sample sheet. read_id_sketch: shared read ids with the run's sketch. sibling_analysis: inherited from an analysis that names this one as input. sample_name_chain: same sample name as a file that carries identifiers. path_rule: a configured path pattern. manual: asserted by a person.",
+   "enum": [
+    "run_dir",
+    "bam_header_rg",
+    "read_tag",
+    "summary_column",
+    "sample_sheet",
+    "read_id_sketch",
+    "sibling_analysis",
+    "sample_name_chain",
+    "path_rule",
+    "manual"
+   ]
+  },
+  "identity": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "run_key": {
+     "description": "{flow_cell_id}_{first 8 hex characters of protocol_run_id}. Stable when the run folder is moved or renamed. Lengthened to 12 characters only if two different protocol runs collide.",
+     "$ref": "#/$defs/safe_id"
+    },
+    "flow_cell": {
+     "type": "object",
+     "required": [
+      "id"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "id": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "user_specified_id": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "product_code": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "asic_id": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "channel_count": {
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 1
+      },
+      "wells_per_channel": {
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 1
+      },
+      "channel_layout": {
+       "description": "Id of the channel geometry the viewer uses, for example promethion_3000 or minion_512.",
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "family": {
+       "description": "Threshold key of the catalogue (when.family). Derived from the product code and the channel count.",
+       "enum": [
+        "promethion",
+        "minion",
+        "flongle",
+        "other",
+        null
+       ]
+      }
+     }
+    },
+    "protocol_run": {
+     "type": "object",
+     "required": [
+      "short_id"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "id": {
+       "description": "Full MinKNOW protocol_run_id (UUID); null for a folder with raw data only.",
+       "$ref": "#/$defs/nullable_name"
+      },
+      "short_id": {
+       "description": "First 8 hex characters of the protocol run id: the part of the run key.",
+       "type": "string",
+       "pattern": "^[0-9a-f]{8}([0-9a-f]{4})?$"
+      },
+      "protocol": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "experiment_id": {
+       "description": "MinKNOW protocol_group_id as recorded in the files, not the folder name.",
+       "$ref": "#/$defs/nullable_name"
+      },
+      "sample_id": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "started": {
+       "anyOf": [
+        {
+         "$ref": "#/$defs/datetime"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "ended": {
+       "anyOf": [
+        {
+         "$ref": "#/$defs/datetime"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "time_origin": {
+       "description": "Zero of every run_time axis in this bundle: the start of data reading in the first sequencing acquisition. MinKNOW's throughput, pore activity and sequencing summary files count time from the same instant, so they can be re-binned without shifting.",
+       "anyOf": [
+        {
+         "$ref": "#/$defs/datetime"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "time_origin_source": {
+       "enum": [
+        "minknow_report",
+        "final_summary",
+        "bam_header",
+        "estimated_from_reads",
+        null
+       ]
+      },
+      "utc_offset_min": {
+       "description": "Offset of the sequencing host's clock from UTC when the run started, when an input records it (final_summary 'started'). MinKNOW folder names use this local time.",
+       "type": [
+        "integer",
+        "null"
+       ]
+      },
+      "state": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "stop_origin": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "run_state": {
+       "description": "FlowCellar's own reading of the folder.",
+       "enum": [
+        "finished",
+        "running",
+        "interrupted",
+        "raw_only",
+        "unknown"
+       ]
+      },
+      "planned_duration_s": {
+       "description": "Planned run time from the protocol arguments or the run-until criteria; run_completion_frac = duration / this.",
+       "type": [
+        "number",
+        "null"
+       ]
+      }
+     }
+    },
+    "acquisitions": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "description": "Full acquisition_run_id (40 hex characters).",
+        "$ref": "#/$defs/name"
+       },
+       "short_id": {
+        "$ref": "#/$defs/name"
+       },
+       "purpose": {
+        "enum": [
+         "sequencing",
+         "calibration",
+         "flow_cell_check",
+         "other",
+         "unknown"
+        ]
+       },
+       "started": {
+        "anyOf": [
+         {
+          "$ref": "#/$defs/datetime"
+         },
+         {
+          "type": "null"
+         }
+        ]
+       },
+       "ended": {
+        "anyOf": [
+         {
+          "$ref": "#/$defs/datetime"
+         },
+         {
+          "type": "null"
+         }
+        ]
+       },
+       "data_read_started": {
+        "anyOf": [
+         {
+          "$ref": "#/$defs/datetime"
+         },
+         {
+          "type": "null"
+         }
+        ]
+       },
+       "offset_s": {
+        "description": "Seconds from time_origin to the start of data reading in this acquisition. Negative for acquisitions before the first sequencing acquisition.",
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "stop_reason": {
+        "$ref": "#/$defs/nullable_name"
+       },
+       "sample_rate_hz": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "read_count": {
+        "type": [
+         "integer",
+         "null"
+        ],
+        "minimum": 0
+       }
+      }
+     }
+    },
+    "device": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "type": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "id": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "position": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "host": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "firmware": {
+       "$ref": "#/$defs/nullable_name"
+      }
+     }
+    },
+    "kit": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "sequencing_kit": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "barcoding_kits": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/name"
+       }
+      },
+      "speed_bps": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "kit_category": {
+       "description": "MinKNOW meta_info.tags.kit_category, for example [RNA, PCR, Multiplexing]. First signal of assay detection.",
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/name"
+       }
+      },
+      "expansion_kits": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/name"
+       }
+      }
+     }
+    },
+    "assay": {
+     "type": "object",
+     "required": [
+      "type"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "type": {
+       "enum": [
+        "gdna",
+        "cdna_pcr",
+        "cdna_direct",
+        "direct_rna",
+        "amplicon",
+        "single_cell",
+        "spatial",
+        "unknown"
+       ]
+      },
+      "group": {
+       "description": "The threshold group the metric catalogue keys its limits by. single_cell and spatial runs use cdna for run-level metrics.",
+       "enum": [
+        "gdna",
+        "cdna",
+        "drna",
+        "unknown"
+       ]
+      },
+      "chemistry": {
+       "description": "For example r10.4.1, r9.4.1, rna004.",
+       "$ref": "#/$defs/nullable_name"
+      },
+      "molecule": {
+       "enum": [
+        "dna",
+        "rna",
+        "unknown"
+       ]
+      },
+      "barcoded": {
+       "type": [
+        "boolean",
+        "null"
+       ]
+      },
+      "source": {
+       "description": "How the assay was decided.",
+       "enum": [
+        "run_files",
+        "kit_table",
+        "library_config",
+        "user",
+        "unknown"
+       ]
+      },
+      "confidence": {
+       "enum": [
+        "certain",
+        "high",
+        "medium",
+        "low"
+       ]
+      },
+      "evidence": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/text"
+       }
+      },
+      "subtype": {
+       "description": "native, amplicon, pcr_cdna, direct_cdna ... as the nanopore catalogue names them.",
+       "$ref": "#/$defs/nullable_name"
+      }
+     }
+    },
+    "software": {
+     "type": "object",
+     "additionalProperties": {
+      "$ref": "#/$defs/nullable_name"
+     },
+     "properties": {
+      "minknow": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "bream": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "distribution": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "basecaller_live": {
+       "$ref": "#/$defs/nullable_name"
+      }
+     }
+    },
+    "basecalling": {
+     "description": "One entry per distinct basecalling of this run found in the inputs.",
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "basecaller": {
+        "$ref": "#/$defs/nullable_name"
+       },
+       "version": {
+        "$ref": "#/$defs/nullable_name"
+       },
+       "model": {
+        "$ref": "#/$defs/nullable_name"
+       },
+       "modbase_models": {
+        "type": "array",
+        "items": {
+         "$ref": "#/$defs/name"
+        }
+       },
+       "live": {
+        "type": "boolean"
+       },
+       "min_qscore": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "inputs": {
+        "type": "array",
+        "items": {
+         "$ref": "#/$defs/safe_id"
+        }
+       },
+       "model_tier": {
+        "description": "Threshold key of the catalogue (when.model_tier).",
+        "enum": [
+         "fast",
+         "hac",
+         "sup",
+         null
+        ]
+       },
+       "trim": {
+        "type": [
+         "boolean",
+         "null"
+        ]
+       },
+       "barcode_both_ends": {
+        "type": [
+         "boolean",
+         "null"
+        ]
+       },
+       "poly_a_estimation": {
+        "type": [
+         "boolean",
+         "null"
+        ]
+       },
+       "variant": {
+        "description": "Label of this basecalling when the run was basecalled more than once.",
+        "$ref": "#/$defs/nullable_name"
+       },
+       "primary": {
+        "description": "true for the basecalling whose reads are the source of record for read-level sections.",
+        "type": [
+         "boolean",
+         "null"
+        ]
+       }
+      }
+     }
+    },
+    "read_id_sketch": {
+     "description": "kind=run. A fixed sub-sample of this run's read ids: every read id whose text starts with prefix (1 in 65,536 for 0000), kept as its first 16 hex characters, sorted. Lets a file that kept read names but lost every other identifier be tied to its runs, with shares. Filled during the pass over the sequencing summary or a BAM; at most 4,096 entries.",
+     "type": "object",
+     "required": [
+      "prefix",
+      "ids"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "prefix": {
+       "type": "string",
+       "pattern": "^0{3,5}$"
+      },
+      "ids": {
+       "type": "array",
+       "maxItems": 4096,
+       "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{16}$"
+       }
+      },
+      "reads_seen": {
+       "description": "Reads the sketch was drawn from.",
+       "$ref": "#/$defs/count"
+      },
+      "source_input": {
+       "type": [
+        "string",
+        "null"
+       ]
+      }
+     }
+    },
+    "analysis": {
+     "description": "kind=analysis only.",
+     "type": "object",
+     "required": [
+      "id",
+      "pipeline",
+      "links"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "id": {
+       "description": "Content hash that identifies the analysis, so identical copies of an output folder collapse into one. The exact recipe belongs to the module that reads the pipeline.",
+       "type": "string",
+       "pattern": "^[0-9a-f]{12,64}$"
+      },
+      "pipeline": {
+       "description": "wf-single-cell, spaceranger, ...",
+       "$ref": "#/$defs/name"
+      },
+      "pipeline_version": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "label": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "path": {
+       "anyOf": [
+        {
+         "$ref": "#/$defs/text"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "sibling_analyses": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/safe_id"
+       }
+      },
+      "links": {
+       "description": "The sequencing runs whose reads this analysis used.",
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "flow_cell_id",
+         "confidence"
+        ],
+        "additionalProperties": false,
+        "properties": {
+         "run_key": {
+          "description": "Set when a run bundle with this key is in the library.",
+          "type": [
+           "string",
+           "null"
+          ]
+         },
+         "flow_cell_id": {
+          "$ref": "#/$defs/name"
+         },
+         "protocol_run_id_prefix": {
+          "type": [
+           "string",
+           "null"
+          ]
+         },
+         "acquisition_run_id_prefix": {
+          "type": [
+           "string",
+           "null"
+          ]
+         },
+         "share": {
+          "description": "Fraction of the analysis reads that came from this run.",
+          "type": [
+           "number",
+           "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+         },
+         "method": {
+          "$ref": "#/$defs/link_method"
+         },
+         "evidence": {
+          "$ref": "#/$defs/text"
+         },
+         "confidence": {
+          "enum": [
+           "certain",
+           "high",
+           "medium",
+           "low"
+          ]
+         },
+         "resolved": {
+          "type": "boolean"
+         }
+        }
+       }
+      },
+      "group_key": {
+       "description": "Slide serial + capture area when known, else the sample label. Sibling pipelines and re-runs of one sample share it; the analysis page is addressed by it.",
+       "$ref": "#/$defs/nullable_name"
+      },
+      "variant": {
+       "description": "Folder name of the output, to tell re-runs apart.",
+       "$ref": "#/$defs/nullable_name"
+      },
+      "assay": {
+       "enum": [
+        "singlecell",
+        "visium",
+        "visium_hd",
+        "bulk",
+        "other",
+        null
+       ]
+      },
+      "unit": {
+       "description": "What a barcode stands for.",
+       "type": [
+        "object",
+        "null"
+       ],
+       "additionalProperties": false,
+       "properties": {
+        "name": {
+         "enum": [
+          "cell",
+          "spot",
+          "bin"
+         ]
+        },
+        "size_um": {
+         "type": [
+          "number",
+          "null"
+         ]
+        }
+       }
+      },
+      "slide_serial_capture_area": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "reference": {
+       "$ref": "#/$defs/nullable_name"
+      }
+     }
+    },
+    "project": {
+     "description": "kind=project only.",
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "name": {
+       "$ref": "#/$defs/name"
+      },
+      "run_keys": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/safe_id"
+       }
+      }
+     }
+    }
+   }
+  },
+  "provenance": {
+   "type": "object",
+   "required": [
+    "generator",
+    "created",
+    "inputs"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "generator": {
+     "type": "object",
+     "required": [
+      "name",
+      "version"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "name": {
+       "const": "flowcellar"
+      },
+      "version": {
+       "type": "string"
+      },
+      "python": {
+       "type": "string"
+      },
+      "platform": {
+       "type": "string"
+      }
+     }
+    },
+    "created": {
+     "$ref": "#/$defs/datetime"
+    },
+    "updated": {
+     "$ref": "#/$defs/datetime"
+    },
+    "revision": {
+     "description": "Incremented each time the bundle file is rewritten.",
+     "type": "integer",
+     "minimum": 1
+    },
+    "library": {
+     "type": [
+      "object",
+      "null"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "id": {
+       "type": "string"
+      },
+      "name": {
+       "$ref": "#/$defs/name"
+      },
+      "config_sha256": {
+       "$ref": "#/$defs/sha256"
+      }
+     }
+    },
+    "run_dir": {
+     "type": [
+      "object",
+      "null"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "path": {
+       "$ref": "#/$defs/text"
+      },
+      "root": {
+       "description": "Id of the configured root the path lies under.",
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "relpath": {
+       "type": [
+        "string",
+        "null"
+       ],
+       "maxLength": 4096
+      },
+      "layout": {
+       "description": "standard: {experiment}/{sample}/{run} as MinKNOW wrote it. moved: identity in the files disagrees with the folder names.",
+       "enum": [
+        "standard",
+        "moved",
+        "raw_only",
+        "unknown"
+       ]
+      },
+      "alternates": {
+       "description": "Other folders holding the same protocol run.",
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/text"
+       }
+      }
+     }
+    },
+    "inputs": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/input"
+     }
+    },
+    "timings": {
+     "description": "Wall-clock cost of producing this bundle. Excluded from content_sha256.",
+     "type": "object",
+     "additionalProperties": {
+      "type": "number"
+     }
+    },
+    "warnings": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/note"
+     }
+    },
+    "profile": {
+     "description": "Size profile the assembler used. standard is the default.",
+     "enum": [
+      "full",
+      "standard",
+      "compact"
+     ]
+    },
+    "partials": {
+     "description": "Sorted ids of every partial merged into this bundle. A bundle is up to date when this set equals the planned set.",
+     "type": "array",
+     "items": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$"
+     }
+    }
+   }
+  },
+  "input": {
+   "type": "object",
+   "required": [
+    "id",
+    "role",
+    "path",
+    "state"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "description": "Local id, referenced by sections.",
+     "$ref": "#/$defs/safe_id"
+    },
+    "role": {
+     "description": "What the file is, for example minknow.final_summary, minknow.sequencing_summary, dorado.bam, align.genome_bam, pychopper.stats.",
+     "type": "string",
+     "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+    },
+    "path": {
+     "$ref": "#/$defs/text"
+    },
+    "root": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "relpath": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "maxLength": 4096
+    },
+    "size": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "mtime": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/datetime"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "fingerprint": {
+     "type": [
+      "object",
+      "null"
+     ],
+     "required": [
+      "method",
+      "value"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "method": {
+       "description": "sha256: the whole file. quick-v1: SHA-256 over the decimal size, the first 1 MiB and the last 1 MiB; used for files over 64 MiB.",
+       "enum": [
+        "sha256",
+        "quick-v1"
+       ]
+      },
+      "value": {
+       "$ref": "#/$defs/sha256"
+      }
+     }
+    },
+    "state": {
+     "enum": [
+      "ok",
+      "growing",
+      "truncated",
+      "partially_read",
+      "missing",
+      "skipped",
+      "error",
+      "represented"
+     ]
+    },
+    "records": {
+     "description": "Rows or reads consumed.",
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "records_skipped": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "scope": {
+     "description": "run: every record belongs to this run. shared: the file also feeds other runs and only the records routed here were counted. sample_all_runs: an aggregate file with no per-read identifiers that covers a sample across all its runs; it is attached unsplit and must be counted once in a project roll-up.",
+     "enum": [
+      "run",
+      "shared",
+      "sample_all_runs"
+     ]
+    },
+    "shared_with": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/safe_id"
+     }
+    },
+    "link": {
+     "description": "Why this file is attached to this run.",
+     "type": "object",
+     "required": [
+      "method",
+      "confidence"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "method": {
+       "$ref": "#/$defs/link_method"
+      },
+      "confidence": {
+       "enum": [
+        "certain",
+        "high",
+        "medium",
+        "low"
+       ]
+      },
+      "evidence": {
+       "$ref": "#/$defs/text"
+      },
+      "rule": {
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "confirmed": {
+       "description": "A person confirmed a medium- or low-confidence link. Unconfirmed links of those grades are shown but kept out of verdicts and of the read-fate funnel.",
+       "type": "boolean"
+      }
+     }
+    },
+    "samples": {
+     "description": "Sample keys this input contributed to.",
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/safe_id"
+     }
+    },
+    "used_by": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/module_id"
+     }
+    },
+    "notes": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/note"
+     }
+    },
+    "alt_paths": {
+     "description": "Other paths that hold the same content (equal fingerprint and size). The input was read, linked and counted once.",
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/text"
+     }
+    },
+    "needs": {
+     "description": "What the input is a candidate for: reads (length, quality, barcodes, read fate up to 'given to a sample'), genome, transcriptome, mods, collected.",
+     "type": "array",
+     "items": {
+      "enum": [
+       "reads",
+       "genome",
+       "transcriptome",
+       "mods",
+       "collected"
+      ]
+     }
+    },
+    "counted_for": {
+     "description": "The needs for which this input is the source of record. Empty: another input is, and this one fed only the modules that name its variant, or nothing.",
+     "type": "array",
+     "items": {
+      "enum": [
+       "reads",
+       "genome",
+       "transcriptome",
+       "mods",
+       "collected"
+      ]
+     }
+    },
+    "variant": {
+     "description": "Label of the version of this file when a sample has several (a second basecalling with another modification model, a second alignment).",
+     "$ref": "#/$defs/nullable_name"
+    },
+    "not_counted_reason": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/text"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "represented_by": {
+     "description": "state=represented: id of the partial that stands in for this input, which is not on this machine.",
+     "anyOf": [
+      {
+       "$ref": "#/$defs/safe_id"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "coverage": {
+     "$ref": "#/$defs/coverage"
+    }
+   }
+  },
+  "note": {
+   "type": "object",
+   "required": [
+    "level",
+    "code",
+    "message"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "level": {
+     "enum": [
+      "info",
+      "warning",
+      "error"
+     ]
+    },
+    "code": {
+     "$ref": "#/$defs/snake_id"
+    },
+    "message": {
+     "$ref": "#/$defs/text"
+    },
+    "title": {
+     "$ref": "#/$defs/name"
+    },
+    "value": {
+     "type": [
+      "number",
+      "string",
+      "null"
+     ]
+    },
+    "source": {
+     "description": "Where the note came from, for example a pipeline's own alarm list.",
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "input": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   }
+  },
+  "tiers": {
+   "type": "object",
+   "required": [
+    "run_health",
+    "read_level"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "run_health": {
+     "type": "object",
+     "required": [
+      "state"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "state": {
+       "enum": [
+        "absent",
+        "live",
+        "partial",
+        "complete"
+       ]
+      },
+      "detail": {
+       "description": "quick: computed from the small MinKNOW files only. full: the sequencing summary was also read.",
+       "enum": [
+        "quick",
+        "full",
+        null
+       ]
+      },
+      "missing_roles": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    },
+    "read_level": {
+     "type": "object",
+     "required": [
+      "state"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "state": {
+       "enum": [
+        "absent",
+        "partial",
+        "complete"
+       ]
+      },
+      "origin": {
+       "description": "Where length and quality came from.",
+       "enum": [
+        "minknow_live_basecalling",
+        "offline_basecalling",
+        "legacy_import",
+        null
+       ]
+      },
+      "samples_expected": {
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 0
+      },
+      "samples_with_data": {
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 0
+      },
+      "reads_expected": {
+       "description": "Reads the flow cell produced according to tier 1.",
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 0
+      },
+      "reads_covered": {
+       "description": "Reads in the source of record of the need 'reads', summed over samples; never a sum of two candidate sources.",
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 0
+      },
+      "missing_roles": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "population": {
+       "anyOf": [
+        {
+         "$ref": "#/$defs/population"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "coverage": {
+       "$ref": "#/$defs/coverage"
+      }
+     }
+    }
+   }
+  },
+  "sample": {
+   "type": "object",
+   "required": [
+    "key"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "key": {
+     "description": "Local key used in cube cells, for example s1. The key 'unclassified' is reserved.",
+     "$ref": "#/$defs/safe_id"
+    },
+    "barcode": {
+     "$ref": "#/$defs/nullable_name"
+    },
+    "alias": {
+     "description": "Alias exactly as the basecaller or MinKNOW recorded it.",
+     "$ref": "#/$defs/nullable_name"
+    },
+    "name": {
+     "description": "Display name after the library's alias map has been applied.",
+     "$ref": "#/$defs/nullable_name"
+    },
+    "sample_uid": {
+     "description": "Identity of the biological sample across runs. Cells with the same sample_uid in different bundles are summed in a project roll-up.",
+     "$ref": "#/$defs/nullable_name"
+    },
+    "type": {
+     "$ref": "#/$defs/nullable_name"
+    },
+    "expected": {
+     "description": "True if a sample sheet declared it; false if it only turned up in the data.",
+     "type": "boolean"
+    },
+    "source": {
+     "enum": [
+      "minknow_sample_sheet",
+      "basecaller_sample_sheet",
+      "bam_read_group",
+      "summary_column",
+      "file_name",
+      "user",
+      "none"
+     ]
+    },
+    "project": {
+     "description": "Project this sample belongs to. Project membership is per sample, not per run: a pooled flow cell can carry two projects.",
+     "$ref": "#/$defs/nullable_name"
+    }
+   }
+  },
+  "axis": {
+   "type": "object",
+   "required": [
+    "type"
+   ],
+   "oneOf": [
+    {
+     "description": "Bin i covers [start + i*step, start + (i+1)*step).",
+     "properties": {
+      "type": {
+       "const": "linear"
+      },
+      "start": {
+       "type": "number"
+      },
+      "step": {
+       "type": "number",
+       "exclusiveMinimum": 0
+      },
+      "n": {
+       "description": "Number of bins; omitted when open-ended, as for run time.",
+       "type": [
+        "integer",
+        "null"
+       ],
+       "minimum": 1
+      },
+      "unit": {
+       "type": "string"
+      },
+      "coarsens_to": {
+       "description": "Axis ids whose edges are a subset of this one, so data can be re-binned exactly.",
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/snake_id"
+       }
+      },
+      "family": {
+       "description": "Nested family: run_time, read_length, qscore, duration, identity_q, polya, speed ... Members of one family merge exactly on the coarser member.",
+       "$ref": "#/$defs/snake_id"
+      },
+      "origin": {
+       "description": "Where zero is, in words, for axes that need it (run time).",
+       "type": "string"
+      },
+      "closed_last": {
+       "description": "True when a value equal to the last edge falls in the last bin (fractions, percentages).",
+       "type": "boolean"
+      },
+      "note": {
+       "description": "One sentence a reader of the axis needs, for example what the overflow cell holds.",
+       "type": "string"
+      }
+     },
+     "required": [
+      "type",
+      "start",
+      "step"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "description": "Bin i covers [10^(min + i/bins_per_decade), 10^(min + (i+1)/bins_per_decade)).",
+     "properties": {
+      "type": {
+       "const": "log10"
+      },
+      "min": {
+       "type": "number"
+      },
+      "bins_per_decade": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "n": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "unit": {
+       "type": "string"
+      },
+      "coarsens_to": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/snake_id"
+       }
+      },
+      "family": {
+       "description": "Nested family: run_time, read_length, qscore, duration, identity_q, polya, speed ... Members of one family merge exactly on the coarser member.",
+       "$ref": "#/$defs/snake_id"
+      },
+      "origin": {
+       "description": "Where zero is, in words, for axes that need it (run time).",
+       "type": "string"
+      },
+      "closed_last": {
+       "description": "True when a value equal to the last edge falls in the last bin (fractions, percentages).",
+       "type": "boolean"
+      },
+      "note": {
+       "description": "One sentence a reader of the axis needs, for example what the overflow cell holds.",
+       "type": "string"
+      }
+     },
+     "required": [
+      "type",
+      "min",
+      "bins_per_decade",
+      "n"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "properties": {
+      "type": {
+       "const": "edges"
+      },
+      "edges": {
+       "type": "array",
+       "items": {
+        "type": "number"
+       },
+       "minItems": 2
+      },
+      "unit": {
+       "type": "string"
+      },
+      "family": {
+       "description": "Nested family: run_time, read_length, qscore, duration, identity_q, polya, speed ... Members of one family merge exactly on the coarser member.",
+       "$ref": "#/$defs/snake_id"
+      },
+      "coarsens_to": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/snake_id"
+       }
+      },
+      "origin": {
+       "description": "Where zero is, in words, for axes that need it (run time).",
+       "type": "string"
+      },
+      "closed_last": {
+       "description": "True when a value equal to the last edge falls in the last bin (fractions, percentages).",
+       "type": "boolean"
+      },
+      "note": {
+       "description": "One sentence a reader of the axis needs, for example what the overflow cell holds.",
+       "type": "string"
+      }
+     },
+     "required": [
+      "type",
+      "edges"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "description": "Fixed-size windows along the contigs of a reference, concatenated in the listed order. Two bundles merge on this axis only when contigs and window agree.",
+     "properties": {
+      "type": {
+       "const": "windows"
+      },
+      "window": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "contigs": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "name",
+         "length"
+        ],
+        "additionalProperties": false,
+        "properties": {
+         "name": {
+          "$ref": "#/$defs/name"
+         },
+         "length": {
+          "type": "integer",
+          "minimum": 1
+         }
+        }
+       }
+      },
+      "unit": {
+       "type": "string"
+      },
+      "family": {
+       "description": "Nested family: run_time, read_length, qscore, duration, identity_q, polya, speed ... Members of one family merge exactly on the coarser member.",
+       "$ref": "#/$defs/snake_id"
+      },
+      "coarsens_to": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/snake_id"
+       }
+      },
+      "origin": {
+       "description": "Where zero is, in words, for axes that need it (run time).",
+       "type": "string"
+      }
+     },
+     "required": [
+      "type",
+      "window",
+      "contigs"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "description": "An integer index such as mux scan number.",
+     "properties": {
+      "type": {
+       "const": "index"
+      },
+      "unit": {
+       "type": "string"
+      },
+      "family": {
+       "description": "Nested family: run_time, read_length, qscore, duration, identity_q, polya, speed ... Members of one family merge exactly on the coarser member.",
+       "$ref": "#/$defs/snake_id"
+      },
+      "coarsens_to": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/snake_id"
+       }
+      },
+      "origin": {
+       "description": "Where zero is, in words, for axes that need it (run time).",
+       "type": "string"
+      }
+     },
+     "required": [
+      "type"
+     ],
+     "additionalProperties": false
+    }
+   ],
+   "description": "An axis id is immutable. The package ships the edges of every registered axis as literal float64 values (axes.json); that table is the definition and the formula members here are documentation. A histogram on an axis with E edges has E+1 cells: below the first edge (under), E-1 inner bins, at or above the last edge (over). Bins are left-closed."
+  },
+  "section": {
+   "type": "object",
+   "required": [
+    "version",
+    "state",
+    "dims",
+    "cells"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "version": {
+     "description": "Version of the module that wrote the section.",
+     "$ref": "#/$defs/semver"
+    },
+    "tier": {
+     "enum": [
+      "run_health",
+      "read_level",
+      "assay",
+      "provenance"
+     ]
+    },
+    "state": {
+     "enum": [
+      "ok",
+      "partial",
+      "skipped",
+      "error"
+     ]
+    },
+    "inputs": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/safe_id"
+     }
+    },
+    "dims": {
+     "description": "Dimensions of the section's cube, in the order used by each cell's 'at'. An empty list means one run-level cell. 'run' is reserved for kind=project, which version 1.0 of the software does not write. end_reason is the dimension of the tier 1 read sections (dyn, len.est) built from the raw sequencing summary.",
+     "type": "array",
+     "items": {
+      "enum": [
+       "sample",
+       "filter",
+       "end_reason",
+       "acquisition",
+       "read_class",
+       "strand",
+       "modification",
+       "reference_set",
+       "run"
+      ]
+     },
+     "uniqueItems": true
+    },
+    "cells": {
+     "description": "The finest partition the module stores. Cells never overlap: summing all cells gives the run total, and summing over one dimension gives the marginal.",
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cell"
+     }
+    },
+    "scalar_merge": {
+     "description": "Merge rule for scalars that are not plain sums. Scalars not listed are summed.",
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/merge_rule"
+     }
+    },
+    "summary": {
+     "description": "Derived run-level metrics (medians, N50, fractions) cached for the index card, status rules and other programs. Not mergeable: recomputed from the cells after any merge.",
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "type": [
+       "number",
+       "string",
+       "boolean",
+       "null"
+      ]
+     }
+    },
+    "params": {
+     "description": "Module parameters that affect the numbers, for example a quality threshold.",
+     "type": "object"
+    },
+    "value_sources": {
+     "description": "For values that can come from more than one place: which input supplied each, and whether it was scraped from a report rather than read from a data file.",
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "input": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "kind": {
+        "enum": [
+         "data",
+         "embedded_json",
+         "html_table",
+         "computed"
+        ]
+       }
+      }
+     }
+    },
+    "notes": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/note"
+     }
+    },
+    "detail": {
+     "description": "Level of the per-sample cells. standard: fine 1-D histograms, hourly series and the length x quality grid; coarse: the next coarser axis of each family and no per-sample 2-D grid (13 samples and more); full: everything per sample.",
+     "enum": [
+      "full",
+      "standard",
+      "coarse"
+     ]
+    },
+    "population": {
+     "description": "Required on every section computed from per-read input: yield.basecalled, len, qual, dyn.basecalled, bc, aln, dup, rna.coverage, and mod when read from BAM tags (checked by the validator, not expressible here without duplicating the section definition). Sections collected from a pipeline's own result files (cdna, quantification, modkit) and read fate name their sources instead.",
+     "anyOf": [
+      {
+       "$ref": "#/$defs/population"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "coverage": {
+     "$ref": "#/$defs/coverage"
+    },
+    "partial_reason": {
+     "description": "Required when state is partial. inputs_missing: a role the module needs was not found (quick detail). partly_read: coverage.kind is not full. samples_missing: some expected samples have no data. waiting: the pass is queued in a scan and has not run yet.",
+     "enum": [
+      "inputs_missing",
+      "partly_read",
+      "samples_missing",
+      "waiting"
+     ]
+    },
+    "run_level": {
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "scalars": {
+       "description": "Counts and sums. Store numerators and denominators, never ratios.",
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "type": [
+         "number",
+         "string",
+         "null"
+        ]
+       }
+      },
+      "hists": {
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "$ref": "#/$defs/hist1d"
+       }
+      },
+      "hists2d": {
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "$ref": "#/$defs/hist2d"
+       }
+      },
+      "series": {
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "$ref": "#/$defs/series"
+       }
+      },
+      "counts": {
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "$ref": "#/$defs/counts"
+       }
+      },
+      "channels": {
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "$ref": "#/$defs/channel_map"
+       }
+      },
+      "tables": {
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "$ref": "#/$defs/table"
+       }
+      },
+      "curves": {
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "$ref": "#/$defs/curve"
+       }
+      },
+      "grids": {
+       "type": "object",
+       "propertyNames": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "additionalProperties": {
+        "$ref": "#/$defs/grid"
+       }
+      }
+     },
+     "description": "Aggregates of the section that are not split by its dims (pore types in dyn, well usage). Same members as a cell, without 'at'. Not part of the cube: rollup never adds them to cells."
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "required": [
+       "state"
+      ],
+      "properties": {
+       "state": {
+        "const": "partial"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "partial_reason"
+      ]
+     }
+    }
+   ]
+  },
+  "cell": {
+   "type": "object",
+   "required": [
+    "at"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "at": {
+     "description": "One value per entry of the section's dims. Sample values are sample keys.",
+     "type": "array",
+     "items": {
+      "type": "string",
+      "maxLength": 256
+     }
+    },
+    "scalars": {
+     "description": "Counts and sums. Store numerators and denominators, never ratios.",
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "type": [
+       "number",
+       "string",
+       "null"
+      ]
+     }
+    },
+    "hists": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/hist1d"
+     }
+    },
+    "hists2d": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/hist2d"
+     }
+    },
+    "series": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/series"
+     }
+    },
+    "counts": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/counts"
+     }
+    },
+    "channels": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/channel_map"
+     }
+    },
+    "tables": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/table"
+     }
+    },
+    "curves": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/curve"
+     }
+    },
+    "grids": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/grid"
+     }
+    }
+   }
+  },
+  "curve": {
+   "description": "A sampled curve with at most 256 points, for example a barcode rank plot or a saturation curve. Not mergeable: a roll-up keeps one curve per source and overlays them.",
+   "type": "object",
+   "required": [
+    "x",
+    "y"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "x": {
+     "type": "array",
+     "items": {
+      "type": "number"
+     },
+     "maxItems": 256
+    },
+    "y": {
+     "type": "object",
+     "additionalProperties": {
+      "$ref": "#/$defs/number_array"
+     }
+    },
+    "x_unit": {
+     "type": "string"
+    },
+    "y_unit": {
+     "type": "string"
+    },
+    "x_scale": {
+     "enum": [
+      "linear",
+      "log10"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "A small 2-D picture: a spatial QC map or the channel x time grid of a flow cell. Not mergeable and never the source of a number: exact totals live in scalars, channels and series. Per channel, data holds rows*cols cells in row-major order. enc u8-b64: base64 of the raw bytes, one byte per cell, level 255 = no data when nodata is true. enc u6: one character of the base64 alphabet per cell (level 0..63), no padding; level 0 = empty cell. value = inverse(level * scale + offset), with inverse = identity (linear), expm1 (log1p) or square (sqrt).",
+   "type": "object",
+   "required": [
+    "rows",
+    "cols",
+    "channels"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "rows": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 4096
+    },
+    "cols": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 4096
+    },
+    "layout": {
+     "description": "square or hex (offset rows), and the physical size of one cell.",
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "kind": {
+       "enum": [
+        "square",
+        "hex",
+        "matrix"
+       ]
+      },
+      "bin_um": {
+       "type": [
+        "number",
+        "null"
+       ]
+      }
+     }
+    },
+    "channels": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "type": "object",
+      "required": [
+       "enc",
+       "data"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "enc": {
+        "enum": [
+         "u8-b64",
+         "u6"
+        ]
+       },
+       "data": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9+/]*={0,2}$"
+       },
+       "scale": {
+        "type": "number"
+       },
+       "offset": {
+        "type": "number"
+       },
+       "transform": {
+        "enum": [
+         "linear",
+         "log1p",
+         "sqrt"
+        ]
+       },
+       "nodata": {
+        "type": "boolean"
+       },
+       "unit": {
+        "type": "string"
+       },
+       "levels": {
+        "type": "integer",
+        "minimum": 2,
+        "maximum": 256
+       }
+      }
+     }
+    },
+    "rows_axis": {
+     "description": "Axis of the rows when the grid is a matrix over named axes, for example channel.",
+     "$ref": "#/$defs/snake_id"
+    },
+    "cols_axis": {
+     "description": "Axis of the columns, for example run_time_7200s.",
+     "$ref": "#/$defs/snake_id"
+    }
+   }
+  },
+  "hist1d": {
+   "description": "Counts per bin of a named axis. Leading and trailing empty bins are trimmed: n[k] belongs to bin start+k. Merge: add bin by bin.",
+   "type": "object",
+   "required": [
+    "axis",
+    "start",
+    "n"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "axis": {
+     "$ref": "#/$defs/snake_id"
+    },
+    "start": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "n": {
+     "$ref": "#/$defs/count_array"
+    },
+    "w": {
+     "description": "Integer sum of the binned quantity per bin, same length as n. For read length the weight is bases, which makes total bases, mean length and bases above any edge exact, and N50 exact to bin resolution. Tier 1 histograms store estimated bases = round(sum of minknow_events in the bin x events_to_base_ratio), so bundles of different chemistries still add.",
+     "$ref": "#/$defs/number_array"
+    },
+    "w_name": {
+     "type": "string"
+    },
+    "under": {
+     "description": "Values below the first axis edge.",
+     "$ref": "#/$defs/count"
+    },
+    "over": {
+     "description": "Values at or above the last axis edge.",
+     "$ref": "#/$defs/count"
+    },
+    "min": {
+     "description": "Exact smallest value seen. Merge: min.",
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "max": {
+     "description": "Exact largest value seen. Merge: max.",
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "missing": {
+     "description": "Reads counted by the cell that have no value for this quantity (no qs tag, poly(A) not found, not aligned). Counted, never binned and never zero.",
+     "$ref": "#/$defs/count"
+    },
+    "w_under": {
+     "description": "Sum of the weighted quantity over the values counted in under. Present when w is. sum(w) + w_under + w_over is the exact total.",
+     "type": "integer",
+     "minimum": 0
+    },
+    "w_over": {
+     "description": "Sum of the weighted quantity over the values counted in over.",
+     "type": "integer",
+     "minimum": 0
+    }
+   }
+  },
+  "hist2d": {
+   "type": "object",
+   "required": [
+    "x",
+    "y",
+    "enc",
+    "n"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "x": {
+     "$ref": "#/$defs/snake_id"
+    },
+    "y": {
+     "$ref": "#/$defs/snake_id"
+    },
+    "enc": {
+     "description": "coo: i, j and n are parallel arrays of non-empty cells sorted by (i, j). dense: n is a row-major matrix of shape.",
+     "enum": [
+      "coo",
+      "dense"
+     ]
+    },
+    "i": {
+     "$ref": "#/$defs/count_array"
+    },
+    "j": {
+     "$ref": "#/$defs/count_array"
+    },
+    "shape": {
+     "type": "array",
+     "items": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "minItems": 2,
+     "maxItems": 2
+    },
+    "n": {
+     "type": "array",
+     "items": {
+      "type": [
+       "integer",
+       "array"
+      ]
+     }
+    },
+    "w": {
+     "description": "Sum of a weight per cell, parallel to n (coo) or the same shape (dense).",
+     "type": "array",
+     "items": {
+      "type": [
+       "number",
+       "array"
+      ]
+     }
+    },
+    "w_name": {
+     "type": "string"
+    },
+    "outside": {
+     "$ref": "#/$defs/count",
+     "description": "Values that fell outside the x or the y axis (below the first or at or above the last edge). Not in n. Merge: add."
+    },
+    "w_outside": {
+     "description": "Sum of the weight over the values counted in outside.",
+     "type": "integer",
+     "minimum": 0
+    },
+    "missing": {
+     "$ref": "#/$defs/count",
+     "description": "Reads counted by the cell that lack the x or the y value. Not in n. Merge: add."
+    }
+   }
+  },
+  "series": {
+   "description": "Values per bin of an axis, usually run time. Every array holds per-bin INCREMENTS (merge: add) unless its name is listed in levels; a level (temperature, voltage, a scan time) is a state, is never added, and must name its merge rule in merge.",
+   "type": "object",
+   "required": [
+    "axis",
+    "start",
+    "values"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "axis": {
+     "$ref": "#/$defs/snake_id"
+    },
+    "start": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "unit": {
+     "type": "string"
+    },
+    "values": {
+     "type": "object",
+     "propertyNames": {
+      "type": "string",
+      "maxLength": 64
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/number_array"
+     }
+    },
+    "merge": {
+     "type": "object",
+     "additionalProperties": {
+      "$ref": "#/$defs/merge_rule"
+     }
+    },
+    "weights": {
+     "type": "string"
+    },
+    "levels": {
+     "description": "Names in values that are levels, not increments. Each must have an entry in merge (mean, same, first, last, min or max).",
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "uniqueItems": true
+    }
+   }
+  },
+  "counts": {
+   "description": "Counter over named categories. Merge: union of categories, add counts.",
+   "type": "object",
+   "required": [
+    "cats",
+    "n"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "cats": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/name"
+     }
+    },
+    "n": {
+     "$ref": "#/$defs/count_array"
+    },
+    "w": {
+     "$ref": "#/$defs/number_array"
+    },
+    "w_name": {
+     "type": "string"
+    },
+    "role": {
+     "description": "funnel: categories are ordered stages, each a subset of the one before (read fate). categories: an unordered partition.",
+     "enum": [
+      "categories",
+      "funnel"
+     ]
+    },
+    "other": {
+     "description": "Count folded into 'other' when the category limit was hit.",
+     "$ref": "#/$defs/count"
+    },
+    "missing": {
+     "description": "Categories whose count is not known (a read-fate stage with no source). Their n is 0 and must be drawn as 'not known', never as zero.",
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/name"
+     }
+    },
+    "sources": {
+     "description": "Where each category's number came from, in words (pychopper report, Dorado BAM ...).",
+     "type": "object",
+     "additionalProperties": {
+      "$ref": "#/$defs/text"
+     }
+    }
+   }
+  },
+  "channel_map": {
+   "description": "One value per channel (or per channel and well when wells is set; index = (channel-1)*wells + (well-1)). The geometry comes from the named layout shipped with the viewer.",
+   "type": "object",
+   "required": [
+    "layout",
+    "values"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "layout": {
+     "type": "string"
+    },
+    "wells": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "values": {
+     "type": "object",
+     "propertyNames": {
+      "$ref": "#/$defs/snake_id"
+     },
+     "additionalProperties": {
+      "$ref": "#/$defs/number_array"
+     }
+    },
+    "merge": {
+     "type": "object",
+     "additionalProperties": {
+      "$ref": "#/$defs/merge_rule"
+     }
+    }
+   }
+  },
+  "table": {
+   "type": "object",
+   "required": [
+    "columns",
+    "rows",
+    "merge"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "columns": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "type": {
+        "enum": [
+         "str",
+         "int",
+         "float",
+         "bool",
+         "datetime"
+        ]
+       },
+       "unit": {
+        "type": "string"
+       },
+       "merge": {
+        "$ref": "#/$defs/merge_rule"
+       }
+      }
+     }
+    },
+    "key": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/snake_id"
+     }
+    },
+    "merge": {
+     "description": "by_key: rows with equal key columns are combined with each column's merge rule. concat: rows are appended (logs). replace: not mergeable; the roll-up keeps one table per run.",
+     "enum": [
+      "by_key",
+      "concat",
+      "replace"
+     ]
+    },
+    "rows": {
+     "type": "array",
+     "items": {
+      "type": "array"
+     }
+    },
+    "total_rows": {
+     "description": "Rows before truncation, when truncated.",
+     "$ref": "#/$defs/count"
+    },
+    "truncated": {
+     "type": "boolean"
+    }
+   }
+  },
+  "status": {
+   "type": "object",
+   "required": [
+    "verdict",
+    "rules"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "verdict": {
+     "description": "Computed verdict. A user override lives in user.verdict_override and never rewrites this.",
+     "enum": [
+      "pass",
+      "warn",
+      "fail",
+      "incomplete",
+      "running",
+      "unknown"
+     ]
+    },
+    "headline": {
+     "description": "One sentence a wet-lab scientist can act on.",
+     "$ref": "#/$defs/text"
+    },
+    "profile": {
+     "description": "The assay threshold profile the rules were evaluated with.",
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "id": {
+       "type": "string"
+      },
+      "version": {
+       "type": "string"
+      },
+      "sha256": {
+       "$ref": "#/$defs/sha256"
+      },
+      "source": {
+       "enum": [
+        "builtin",
+        "library_config",
+        "command_line"
+       ]
+      }
+     }
+    },
+    "evaluated": {
+     "$ref": "#/$defs/datetime"
+    },
+    "by_tier": {
+     "description": "The roll-up per part. not_available: that part has no data (no read data linked yet; or read data without a MinKNOW folder) and never lowers the verdict. unknown: data exist but no check could be assessed. The overall verdict is the worse of the two parts, leaving out not_available.",
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "run_health": {
+       "enum": [
+        "pass",
+        "warn",
+        "fail",
+        "incomplete",
+        "running",
+        "unknown",
+        "not_available"
+       ]
+      },
+      "read_level": {
+       "enum": [
+        "pass",
+        "warn",
+        "fail",
+        "incomplete",
+        "unknown",
+        "not_available"
+       ]
+      }
+     }
+    },
+    "rules": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "severity",
+       "outcome",
+       "message"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "description": "Stable rule id. By convention the id of the metric it assesses in the module catalogue, for example fc_occupancy_first_hour.",
+        "$ref": "#/$defs/module_id"
+       },
+       "role": {
+        "description": "key: may set the verdict to fail. supporting: may set it to warn at most. info: shown, never changes the verdict.",
+        "enum": [
+         "key",
+         "supporting",
+         "info"
+        ]
+       },
+       "tier": {
+        "description": "Which part of the two-part verdict the rule counts towards. Rules of assay modules (cdna, rna, drna, mod, dup) count towards read_level.",
+        "enum": [
+         "run_health",
+         "read_level"
+        ]
+       },
+       "module": {
+        "$ref": "#/$defs/module_id"
+       },
+       "severity": {
+        "description": "Level reached. none unless outcome is triggered; then warn or fail (info for a triggered note that changes nothing). What a check may do at most follows from role: key can fail, supporting can warn.",
+        "enum": [
+         "none",
+         "info",
+         "warn",
+         "fail"
+        ]
+       },
+       "outcome": {
+        "enum": [
+         "ok",
+         "triggered",
+         "not_evaluated"
+        ]
+       },
+       "scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+         "sample": {
+          "type": [
+           "string",
+           "null"
+          ]
+         }
+        }
+       },
+       "metric": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "value": {
+        "type": [
+         "number",
+         "string",
+         "null"
+        ]
+       },
+       "threshold": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+         "kind": {
+          "description": "min: higher is better, pass at or above warn, fail below fail. max: lower is better. range: pass inside pass_band, warn inside warn_band, fail outside. run_config: limits read from the run's own files. baseline: judged against comparable runs of the library by a robust z-score (median, MAD with a floor); details in 'baseline'. rule: a categorical rule described in basis.",
+          "enum": [
+           "min",
+           "max",
+           "range",
+           "run_config",
+           "baseline",
+           "rule"
+          ]
+         },
+         "warn": {
+          "type": [
+           "number",
+           "string",
+           "null"
+          ],
+          "description": "The FIXED warning level (catalogue or profile). History levels live in baseline.warn_level."
+         },
+         "fail": {
+          "type": [
+           "number",
+           "string",
+           "null"
+          ],
+          "description": "The FIXED fail level, or null when the check has a warning level only."
+         },
+         "pass_band": {
+          "type": "array",
+          "items": {
+           "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+         },
+         "warn_band": {
+          "type": "array",
+          "items": {
+           "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+         },
+         "basis": {
+          "description": "Where the limits came from, in words: the profile entry, the run's target band, or the peer runs used.",
+          "$ref": "#/$defs/text"
+         },
+         "peers": {
+          "description": "kind=baseline: number of comparable runs the limits were taken from.",
+          "type": [
+           "integer",
+           "null"
+          ],
+          "minimum": 0
+         },
+         "baseline": {
+          "description": "History the value was placed against: eligible runs of the comparison group that STARTED BEFORE this run (as_of), at most 40. z = (value - median) / scale, scale = max(1.4826 * MAD, floor * |median|). The band is the zone treated as normal (|z| < 1.5): what tiles and charts draw as 'typical for this lab'.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+           "group": {
+            "description": "Comparison group: device type | flow cell product | kit, plus the group label when one is set; fc_adapter_frac adds MinKNOW major.minor; read-data groups add the read population.",
+            "$ref": "#/$defs/name"
+           },
+           "trust": {
+            "description": "trusted: 8 or more comparable first-use runs before this one; may fail the outcome. provisional: 5 to 7, or the spread guard tripped; may warn only. wider_group: device type + assay group, shown as a band only, never judges. none: fewer than 5.",
+            "enum": [
+             "trusted",
+             "provisional",
+             "wider_group",
+             "none"
+            ]
+           },
+           "n": {
+            "type": "integer",
+            "minimum": 0
+           },
+           "median": {
+            "type": [
+             "number",
+             "null"
+            ]
+           },
+           "scale": {
+            "type": [
+             "number",
+             "null"
+            ]
+           },
+           "z": {
+            "type": [
+             "number",
+             "null"
+            ]
+           },
+           "rank_below": {
+            "description": "Comparable runs with a lower value, for wording such as 'lower than 24 of 26'.",
+            "type": [
+             "integer",
+             "null"
+            ],
+            "minimum": 0
+           },
+           "band": {
+            "type": "array",
+            "items": {
+             "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+           },
+           "warn_z": {
+            "type": [
+             "number",
+             "null"
+            ]
+           },
+           "fail_z": {
+            "type": [
+             "number",
+             "null"
+            ]
+           },
+           "horizon_h": {
+            "description": "For output rules: the fixed horizon judged (6, 12, 24, 48 or 72).",
+            "type": [
+             "number",
+             "null"
+            ]
+           },
+           "group_label": {
+            "$ref": "#/$defs/nullable_name"
+           },
+           "as_of": {
+            "anyOf": [
+             {
+              "$ref": "#/$defs/datetime"
+             },
+             {
+              "type": "null"
+             }
+            ]
+           },
+           "spread": {
+            "description": "1.4826 * MAD / median of the window. Above 0.45 the history is provisional whatever n is (spread guard).",
+            "type": [
+             "number",
+             "null"
+            ]
+           },
+           "spread_guard": {
+            "type": "boolean"
+           },
+           "warn_level": {
+            "description": "The warning level in the metric's own unit (median + warn_z * scale): what the sentence quotes.",
+            "type": [
+             "number",
+             "null"
+            ]
+           },
+           "fail_level": {
+            "type": [
+             "number",
+             "null"
+            ]
+           }
+          }
+         },
+         "applied": {
+          "description": "Which level set decided the outcome when both a fixed fall-back and a history exist: fixed, baseline (history as of the run's start), run_config (limits read from the run's own files), rule (a categorical rule).",
+          "enum": [
+           "fixed",
+           "baseline",
+           "run_config",
+           "rule"
+          ]
+         }
+        }
+       },
+       "message": {
+        "$ref": "#/$defs/text"
+       },
+       "not_evaluated_reason": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "panel": {
+        "description": "Viewer panel that shows the evidence.",
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "span_s": {
+        "description": "For a rule about a time span: start and end in seconds on the run-time axis, so the viewer can place the cursor.",
+        "type": "array",
+        "items": {
+         "type": "number"
+        },
+        "minItems": 2,
+        "maxItems": 2
+       },
+       "population": {
+        "description": "Read-data rules: the population the value was computed on.",
+        "anyOf": [
+         {
+          "$ref": "#/$defs/population"
+         },
+         {
+          "type": "null"
+         }
+        ]
+       }
+      }
+     }
+    },
+    "detail": {
+     "description": "Optional second sentence: the detail, or what has not been judged.",
+     "$ref": "#/$defs/text"
+    },
+    "cause": {
+     "description": "Why the verdict is incomplete (the interface never shows 'aborted'). stopped_early: the run lasted under one hour. output_not_judged: 1 h to under 6 h and no check triggered; Run health is never Pass without an output check.",
+     "enum": [
+      "stopped_early",
+      "output_not_judged",
+      "no_final_summary",
+      "raw_only",
+      "inputs_missing",
+      null
+     ]
+    },
+    "modifiers": {
+     "description": "Facts that change how the verdict must be read: reused_flow_cell, flow_cell_use_unknown, baseline_provisional, baseline_spread_guard, no_history, judged_before_older_runs, unconfirmed_links, custom_profile, quick_detail. One sentence each, shown under the verdict.",
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "code",
+       "message"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "code": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "message": {
+        "$ref": "#/$defs/text"
+       }
+      }
+     }
+    },
+    "estimates": {
+     "description": "Labelled estimates that depend on the library's history and never set a verdict: yield_forecast_24h / 48h / 72h. Like the rest of status they are outside content_sha256.",
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "value": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "lo": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "hi": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "unit": {
+        "type": "string"
+       },
+       "basis": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+         "model": {
+          "type": "string"
+         },
+         "group": {
+          "$ref": "#/$defs/name"
+         },
+         "n": {
+          "type": "integer",
+          "minimum": 0
+         },
+         "hours_used": {
+          "type": "number"
+         }
+        }
+       },
+       "message": {
+        "$ref": "#/$defs/text"
+       }
+      }
+     }
+    },
+    "provisional": {
+     "description": "true while tier 1 is in quick detail: the verdict covers the checks done so far and is worded 'Pass so far'.",
+     "type": "boolean"
+    },
+    "pending": {
+     "description": "Ids of checks that wait for the read pass.",
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/snake_id"
+     }
+    },
+    "judged": {
+     "description": "The judgement itself. A stored verdict is frozen: it is evaluated again only when the run's measured content changes, when limits change and recompute --status-only runs, or on request after older runs were added (--rebaseline). A later run never changes it.",
+     "type": "object",
+     "additionalProperties": false,
+     "properties": {
+      "at": {
+       "anyOf": [
+        {
+         "$ref": "#/$defs/datetime"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "as_of": {
+       "description": "Start of the run: only eligible runs that started before it are in the history.",
+       "anyOf": [
+        {
+         "$ref": "#/$defs/datetime"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "history_hash": {
+       "description": "Hash over the keys and values of the peers used; differs from the library's when older runs were added since.",
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "library": {
+       "description": "false: judged without a library (flowcellar run): fixed limits only.",
+       "type": "boolean"
+      },
+      "frozen": {
+       "type": "boolean"
+      }
+     }
+    },
+    "explanations": {
+     "description": "Numbers placed against history that explain a verdict and never change it on a first-use run: pores at the first scan (flow cell), occupancy over 24 h (loading), kb per working channel-hour (library), and the other metrics of limit kind baseline. direction is what the hub's 'Differs from typical' column words.",
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "direction"
+      ],
+      "additionalProperties": false,
+      "properties": {
+       "id": {
+        "$ref": "#/$defs/snake_id"
+       },
+       "aspect": {
+        "enum": [
+         "flow_cell",
+         "loading",
+         "library",
+         "other"
+        ]
+       },
+       "value": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "direction": {
+        "enum": [
+         "low",
+         "typical",
+         "high",
+         "unknown"
+        ]
+       },
+       "baseline": {
+        "description": "History the value was placed against: eligible runs of the comparison group that STARTED BEFORE this run (as_of), at most 40. z = (value - median) / scale, scale = max(1.4826 * MAD, floor * |median|). The band is the zone treated as normal (|z| < 1.5): what tiles and charts draw as 'typical for this lab'.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+         "group": {
+          "description": "Comparison group: device type | flow cell product | kit, plus the group label when one is set; fc_adapter_frac adds MinKNOW major.minor; read-data groups add the read population.",
+          "$ref": "#/$defs/name"
+         },
+         "trust": {
+          "description": "trusted: 8 or more comparable first-use runs before this one; may fail the outcome. provisional: 5 to 7, or the spread guard tripped; may warn only. wider_group: device type + assay group, shown as a band only, never judges. none: fewer than 5.",
+          "enum": [
+           "trusted",
+           "provisional",
+           "wider_group",
+           "none"
+          ]
+         },
+         "n": {
+          "type": "integer",
+          "minimum": 0
+         },
+         "median": {
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "scale": {
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "z": {
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "rank_below": {
+          "description": "Comparable runs with a lower value, for wording such as 'lower than 24 of 26'.",
+          "type": [
+           "integer",
+           "null"
+          ],
+          "minimum": 0
+         },
+         "band": {
+          "type": "array",
+          "items": {
+           "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+         },
+         "warn_z": {
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "fail_z": {
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "horizon_h": {
+          "description": "For output rules: the fixed horizon judged (6, 12, 24, 48 or 72).",
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "group_label": {
+          "$ref": "#/$defs/nullable_name"
+         },
+         "as_of": {
+          "anyOf": [
+           {
+            "$ref": "#/$defs/datetime"
+           },
+           {
+            "type": "null"
+           }
+          ]
+         },
+         "spread": {
+          "description": "1.4826 * MAD / median of the window. Above 0.45 the history is provisional whatever n is (spread guard).",
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "spread_guard": {
+          "type": "boolean"
+         },
+         "warn_level": {
+          "description": "The warning level in the metric's own unit (median + warn_z * scale): what the sentence quotes.",
+          "type": [
+           "number",
+           "null"
+          ]
+         },
+         "fail_level": {
+          "type": [
+           "number",
+           "null"
+          ]
+         }
+        }
+       },
+       "message": {
+        "$ref": "#/$defs/text"
+       }
+      }
+     }
+    }
+   }
+  },
+  "user": {
+   "description": "Free-form metadata owned by people, not by the engine. In a library it is copied from annotations/{run_key}.toml when the bundle is written; recomputation never changes the annotation file.",
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "tags": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "pattern": "^[^\\s,]{1,64}$"
+     },
+     "uniqueItems": true
+    },
+    "notes": {
+     "type": "string",
+     "maxLength": 20000
+    },
+    "display_name": {
+     "$ref": "#/$defs/nullable_name"
+    },
+    "fields": {
+     "description": "Any key/value pairs the lab wants: operator, library prep date, flow cell lot, target yield.",
+     "type": "object",
+     "additionalProperties": {
+      "type": [
+       "string",
+       "number",
+       "boolean",
+       "null"
+      ]
+     }
+    },
+    "verdict_override": {
+     "type": [
+      "object",
+      "null"
+     ],
+     "required": [
+      "verdict",
+      "reason"
+     ],
+     "additionalProperties": false,
+     "properties": {
+      "verdict": {
+       "enum": [
+        "pass",
+        "warn",
+        "fail"
+       ]
+      },
+      "reason": {
+       "$ref": "#/$defs/text"
+      },
+      "by": {
+       "$ref": "#/$defs/nullable_name"
+      },
+      "at": {
+       "$ref": "#/$defs/datetime"
+      }
+     }
+    },
+    "updated": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/datetime"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "exclude_from_baselines": {
+     "description": "A person marked this run as not typical; it never teaches a baseline.",
+     "type": "boolean"
+    },
+    "baseline_group": {
+     "description": "Comparison group label set by a person: starts a new group when the protocol changed.",
+     "$ref": "#/$defs/nullable_name"
+    },
+    "flow_cell_use": {
+     "description": "Declared use index of the flow cell (1 = first use is established).",
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 1
+    },
+    "flow_cell_check_pores": {
+     "description": "Pores counted by MinKNOW's flow cell check before loading, as typed in by the lab.",
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    }
+   }
+  },
+  "population": {
+   "description": "Which reads a read-level section describes. Derived from the role of the source of record, its @PG lines (--min-qscore, --no-trim, --barcode-both-ends, a pychopper program line) and the read-name prefix pychopper writes. Limits name the populations they apply to; baselines, Compare and hub sorting never mix populations without a notice.",
+   "type": "object",
+   "required": [
+    "stage"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "stage": {
+     "description": "basecalled_all: every read the basecaller wrote. basecalled_pass: reads that passed the quality filter. classified: passed reads given to a sample by the demultiplexer. full_length_trimmed: classified reads kept, oriented and trimmed by a cDNA pre-processor (pychopper). aligned_primary: a file that holds mapped reads only.",
+     "enum": [
+      "basecalled_all",
+      "basecalled_pass",
+      "classified",
+      "full_length_trimmed",
+      "aligned_primary"
+     ]
+    },
+    "min_qscore": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "trimmed": {
+     "type": [
+      "boolean",
+      "null"
+     ]
+    },
+    "both_end_barcodes": {
+     "type": [
+      "boolean",
+      "null"
+     ]
+    },
+    "source_role": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "evidence": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/text"
+     }
+    }
+   }
+  },
+  "coverage": {
+   "description": "On how much of its source a section, an input or the read-level tier rests. full: every record was read. byte_ranges: a time-limited pass read evenly spread byte ranges of a text table. truncated: the file ended early or is still growing; everything before the break was read. stride: a declared 1-in-n of reads chosen by read-id hash.",
+   "type": "object",
+   "required": [
+    "kind"
+   ],
+   "additionalProperties": false,
+   "properties": {
+    "kind": {
+     "enum": [
+      "full",
+      "byte_ranges",
+      "truncated",
+      "stride"
+     ]
+    },
+    "records": {
+     "description": "Records read.",
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "records_total": {
+     "description": "Records the source holds, when known from another file (MinKNOW's read count, a BAM index).",
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
+    "fraction": {
+     "description": "Share of the source that was read: bytes for byte_ranges and truncated, records otherwise. 1 for full.",
+     "type": [
+      "number",
+      "null"
+     ],
+     "minimum": 0,
+     "maximum": 1
+    },
+    "stride": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 1
+    }
+   }
+  }
+ },
+ "x-stability": {
+  "description": "candidate: implemented or about to be, intended to survive to schema 1.0. experimental: no released code writes it yet; may change in any 0.x. A section moves to candidate in the release that first writes it.",
+  "candidate": [
+   "format",
+   "schema_version",
+   "kind",
+   "bundle_id",
+   "content_sha256",
+   "identity",
+   "provenance",
+   "tiers",
+   "samples",
+   "axes",
+   "status",
+   "user",
+   "relations",
+   "modules.run",
+   "modules.fc",
+   "modules.yield",
+   "modules.dyn",
+   "modules.len.est",
+   "aggregate kinds: scalars, hists, hists2d, series, counts, channels, tables, grids",
+   "coverage",
+   "section.run_level",
+   "relations.projects"
+  ],
+  "experimental": [
+   "kind=analysis",
+   "identity.analysis",
+   "modules.yield.basecalled",
+   "modules.len",
+   "modules.qual",
+   "modules.dyn.basecalled",
+   "modules.bc",
+   "modules.aln",
+   "modules.aln.windows",
+   "modules.dup",
+   "modules.mod",
+   "modules.as",
+   "modules.as.targets",
+   "modules.cdna",
+   "modules.rna",
+   "modules.rna.coverage",
+   "modules.drna",
+   "modules.funnel",
+   "modules.funnel.samples",
+   "modules.sc",
+   "aggregate kind: curves"
+  ]
+ },
+ "x-changes": {
+  "0.1.1": [
+   "$id says 0.1.1; schema_version must match 0.1.x",
+   "hist1d: w_under, w_over",
+   "hist2d: outside, w_outside, missing",
+   "coverage {kind, records, records_total, fraction, stride} on section, input and tiers.read_level; section.partial_reason required when state is partial",
+   "section.run_level: aggregates not split by the section's dims",
+   "status.rules[].threshold.applied; warn and fail are the fixed levels",
+   "status.rules[].severity: none unless triggered",
+   "series.levels",
+   "identity.protocol_run: short_id required, id may be null",
+   "user.project removed; relations.projects and relations.paths added",
+   "status.by_tier.*: value not_available",
+   "section.approximate removed",
+   "axis: closed_last and note on linear, log10 and edges axes"
+  ]
+ }
+}

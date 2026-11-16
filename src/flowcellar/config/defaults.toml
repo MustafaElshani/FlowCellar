@@ -1,0 +1,51 @@
+# FlowCellar: the defaults every library starts from. Generic values only: nothing here names a
+# laboratory's folders or files. A library's own flowcellar.toml overrides these key by key.
+
+[library]
+# name = "..."                    default: the name of the library folder
+
+[discovery]
+min_age_seconds = 120             # a file changed more recently than this is left for the next scan
+stale_after_hours = 6             # a run without a final summary counts as running while files still change
+prune = []                        # folder names (shell patterns) the walk never lists, added to the built-in list
+subtree_listing_budget = 20000    # folders listed under one first-level folder of a root before it is given up
+root_check_seconds = 20           # a root that does not answer within this time is skipped
+stall_timeout_seconds = 120       # a walk that makes no progress for this long is abandoned
+
+[variants]
+# primary = "main"                 the version of a file that counts when a sample has several
+
+[samples]
+unclassified = ["unclassified"]
+
+[samples.alias]
+# "name as recorded" = "name to show"
+
+[project]
+from = "path"                     # the folder named by each root's project_depth or project_pattern
+exclude = []                      # folder names that are never a project (the folder names of [[inputs]] patterns are added)
+
+[baselines]
+window = 40
+min_runs = 5
+trusted_runs = 8
+spread_guard = 0.45
+
+[flow_cell]
+restart_max_hours = 2
+restart_max_output_frac = 0.02
+
+[scan]
+jobs = 0                          # worker processes for large files; 0 chooses by itself
+threads = 4
+quick_first = true
+time_box_minutes = 240            # stop starting new passes after this many minutes; 0 = no limit
+live_workers = 2                  # workers for a root marked live = true
+
+[hub]
+sidecars = true
+reports = false
+
+[serve]
+host = "127.0.0.1"
+port = 8737

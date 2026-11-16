@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" role="img" aria-labelledby="t d">
+<title id="t">What FlowCellar reads, what its library holds and what you look at</title>
+<desc id="d">On the left the files a laboratory already has: MinKNOW run folders, which are all that is needed, and seven further kinds that each add sections. In the middle the command flowcellar scan, which only reads them. Then the library, one folder with a small file per run, the verdicts, an index, the pages and the configuration. On the right the pages: Home, Runs, Projects, Analyses, a page per run, Compare, flow cell history, one-file reports and PDF.</desc>
+<text x="2" y="16" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#606468" text-anchor="start" letter-spacing="0.06em">WHAT YOU ALREADY HAVE</text>
+<rect x="0.5" y="34.5" width="295" height="53" rx="6" fill="#eef5fe" stroke="#2a78d6" stroke-width="1.5"/>
+<g transform="translate(13 49.5)" fill="none" stroke="#0a213c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M1.5 5.5h6l2 2.5h11v10.5h-19z"/></g>
+<text x="46" y="57" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">MinKNOW run folders</text>
+<text x="46" y="75" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">reports, pore scans, sequencing summary</text>
+<rect x="208" y="43" width="78" height="20" rx="10" fill="#2a78d6"/>
+<text x="247" y="57.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">all you need</text>
+<rect x="0.5" y="116.5" width="295" height="53" rx="6" fill="#ffffff" stroke="#cac7c2" stroke-width="1"/>
+<g transform="translate(13 131.5)" fill="none" stroke="#0a213c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 1.5h8l4.5 4.5v14.5h-12.500z"/><path d="M13 1.500v4.500h4.500"/><path d="M8 11h6.500M8 14.500h6.500"/></g>
+<text x="46" y="139" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Basecalled BAM files</text>
+<text x="46" y="157" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">length, quality, samples, poly(A)</text>
+<rect x="0.5" y="178.5" width="295" height="53" rx="6" fill="#ffffff" stroke="#cac7c2" stroke-width="1"/>
+<g transform="translate(13 193.5)" fill="none" stroke="#0a213c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 1.5h8l4.5 4.5v14.5h-12.500z"/><path d="M13 1.500v4.500h4.500"/><path d="M8 11h6.500M8 14.500h6.500"/></g>
+<text x="46" y="201" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Aligned BAM files</text>
+<text x="46" y="219" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">to a genome, to transcripts</text>
+<rect x="0.5" y="240.5" width="295" height="53" rx="6" fill="#ffffff" stroke="#cac7c2" stroke-width="1"/>
+<g transform="translate(13 255.5)" fill="none" stroke="#0a213c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M2 3.500h18v15h-18z"/><path d="M2 8.500h18M2 13.500h18M8 3.500v15"/></g>
+<text x="46" y="263" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">pychopper statistics</text>
+<text x="46" y="281" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">full-length cDNA, rescued, unusable</text>
+<rect x="0.5" y="302.5" width="295" height="53" rx="6" fill="#ffffff" stroke="#cac7c2" stroke-width="1"/>
+<g transform="translate(13 317.5)" fill="none" stroke="#0a213c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M2 3.500h18v15h-18z"/><path d="M2 8.500h18M2 13.500h18M8 3.500v15"/></g>
+<text x="46" y="325" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Annotated read tables</text>
+<text x="46" y="343" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">transcript type, poly(A) tail per read</text>
+<rect x="0.5" y="364.5" width="295" height="53" rx="6" fill="#ffffff" stroke="#cac7c2" stroke-width="1"/>
+<g transform="translate(13 379.5)" fill="none" stroke="#0a213c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M2 3.500h18v15h-18z"/><path d="M2 8.500h18M2 13.500h18M8 3.500v15"/></g>
+<text x="46" y="387" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Quantification metadata</text>
+<text x="46" y="405" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">salmon, oarfish, kallisto</text>
+<rect x="0.5" y="426.5" width="295" height="53" rx="6" fill="#ffffff" stroke="#cac7c2" stroke-width="1"/>
+<g transform="translate(13 441.5)" fill="none" stroke="#0a213c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M1.5 5.5h6l2 2.5h11v10.5h-19z"/></g>
+<text x="46" y="449" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">wf-single-cell output folders</text>
+<text x="46" y="467" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">single-cell and spatial, ONT workflow</text>
+<rect x="0.5" y="488.5" width="295" height="53" rx="6" fill="#ffffff" stroke="#cac7c2" stroke-width="1"/>
+<g transform="translate(13 503.5)" fill="none" stroke="#0a213c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M1.5 5.5h6l2 2.5h11v10.5h-19z"/></g>
+<text x="46" y="511" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Space Ranger output folders</text>
+<text x="46" y="529" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">Visium and Visium HD</text>
+<text x="2" y="109" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#606468" text-anchor="start" letter-spacing="0.06em">OPTIONAL · EACH KIND ADDS SECTIONS</text>
+<path d="M306 302H431" stroke="#2a78d6" stroke-width="2.5" fill="none"/><path d="M429 296L438 302L429 308z" fill="#2a78d6"/>
+<rect x="304" y="258" width="134" height="30" rx="6" fill="#0a213c"/>
+<text x="371" y="278" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="13" font-weight="600" fill="#f7f6f3" text-anchor="middle">flowcellar scan</text>
+<text x="371" y="328" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="middle">reads, never writes</text>
+<text x="371" y="351" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="middle">nothing leaves</text>
+<text x="371" y="368" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="middle">the computer</text>
+<text x="371" y="391" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="middle">goes on where</text>
+<text x="371" y="408" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="middle">it stopped</text>
+<text x="448" y="16" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#606468" text-anchor="start" letter-spacing="0.06em">THE LIBRARY · ONE FOLDER</text>
+<rect x="446.5" y="34.5" width="249" height="554" rx="8" fill="#f7f6f3" stroke="#cac7c2"/>
+<g transform="translate(457.8 46.28) scale(0.62)"><path fill="#0a213c" d="M10.367 24V24A22 22 0 0 1 22 8.404V24ZM26 24V6.834A22 22 0 0 1 38 6.834V24ZM42 24V8.404A22 22 0 0 1 53.633 24V24ZM10 28H22V41H10ZM26 28H38V41H26ZM10 45H22V58H10ZM26 45H38V58H26ZM42 45H54V58H42Z"/><path fill="#2a78d6" d="M42 28H54V41H42Z"/></g>
+<text x="504" y="64" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#0a213c" text-anchor="start">small, rebuildable,</text>
+<text x="504" y="81" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#0a213c" text-anchor="start">never a copy of your data</text>
+<rect x="458.5" y="102.5" width="225" height="84" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<text x="470" y="126" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="13" font-weight="600" fill="#0a213c" text-anchor="start">bundles/</text>
+<text x="470" y="146" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">one small file per run, and one</text>
+<text x="470" y="162" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">per analysis: what was measured</text>
+<rect x="458.5" y="198.5" width="225" height="84" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<text x="470" y="222" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="13" font-weight="600" fill="#0a213c" text-anchor="start">status/</text>
+<text x="470" y="242" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">each verdict with its reasons,</text>
+<text x="470" y="258" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">in plain sentences</text>
+<rect x="458.5" y="294.5" width="225" height="84" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<text x="470" y="318" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="13" font-weight="600" fill="#0a213c" text-anchor="start">index/</text>
+<text x="470" y="338" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">one row per run, for the tables</text>
+<text x="470" y="354" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">and the search</text>
+<rect x="458.5" y="390.5" width="225" height="84" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<text x="470" y="414" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="13" font-weight="600" fill="#0a213c" text-anchor="start">hub/</text>
+<text x="470" y="434" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">the pages: open them from a file</text>
+<text x="470" y="450" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">or the built-in server</text>
+<rect x="458.5" y="486.5" width="225" height="84" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<text x="470" y="510" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="13" font-weight="600" fill="#0a213c" text-anchor="start">flowcellar.toml</text>
+<text x="470" y="530" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">your file patterns and limits:</text>
+<text x="470" y="546" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">the only file you edit</text>
+<path d="M704 302H721" stroke="#2a78d6" stroke-width="2.5" fill="none"/><path d="M719 296L728 302L719 308z" fill="#2a78d6"/>
+<text x="736" y="16" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#606468" text-anchor="start" letter-spacing="0.06em">WHAT YOU LOOK AT · IN A BROWSER</text>
+<rect x="734.5" y="34.5" width="265" height="82.33333333333333" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<rect x="734.5" y="34.5" width="5" height="82.33333333333333" rx="2.5" fill="#2a78d6"/>
+<text x="752" y="72.16666666666666" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Home</text>
+<text x="752" y="91.16666666666666" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">what is there, what needs a look</text>
+<rect x="734.5" y="126.83333333333333" width="265" height="82.33333333333333" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<rect x="734.5" y="126.83333333333333" width="5" height="82.33333333333333" rx="2.5" fill="#2a78d6"/>
+<text x="752" y="164.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Runs · Projects · Analyses</text>
+<text x="752" y="183.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">tables with search and filters</text>
+<rect x="734.5" y="219.16666666666666" width="265" height="82.33333333333333" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<rect x="734.5" y="219.16666666666666" width="5" height="82.33333333333333" rx="2.5" fill="#2a78d6"/>
+<text x="752" y="256.8333333333333" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">A page per run</text>
+<text x="752" y="275.8333333333333" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">run health and read data, every chart</text>
+<rect x="734.5" y="311.5" width="265" height="82.33333333333333" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<rect x="734.5" y="311.5" width="5" height="82.33333333333333" rx="2.5" fill="#2a78d6"/>
+<text x="752" y="349.1666666666667" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Compare</text>
+<text x="752" y="368.1666666666667" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">up to eight runs side by side</text>
+<rect x="734.5" y="403.8333333333333" width="265" height="82.33333333333333" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<rect x="734.5" y="403.8333333333333" width="5" height="82.33333333333333" rx="2.5" fill="#2a78d6"/>
+<text x="752" y="441.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">Flow cell history</text>
+<text x="752" y="460.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">every loading of one flow cell</text>
+<rect x="734.5" y="496.16666666666663" width="265" height="82.33333333333333" rx="6" fill="#ffffff" stroke="#cac7c2"/>
+<rect x="734.5" y="496.16666666666663" width="5" height="82.33333333333333" rx="2.5" fill="#2a78d6"/>
+<text x="752" y="533.8333333333333" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0a213c" text-anchor="start">One-file report · PDF</text>
+<text x="752" y="552.8333333333333" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#606468" text-anchor="start">to mail, archive or print</text>
+</svg>

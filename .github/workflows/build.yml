@@ -1,0 +1,97 @@
+name: build
+
+# The release path. Builds the viewer, the source distribution and the wheel, and checks them.
+# They are published to PyPI only when this workflow runs for a pushed version tag (v1.2.3), by the job
+# "publish", through PyPI trusted publishing: no token and no password is stored anywhere.
+#
+# PyPI accepts the upload only from this combination (docs/releasing.md); do not rename any of them:
+#   PyPI project   flowcellar
+#   repository     MustafaElshani/FlowCellar
+#   workflow file  build.yml
+#   environment    pypi
+#
+# Started by hand ("Run workflow") it builds and checks everything and publishes nothing.
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
+jobs:
+  build:
+    name: Build and check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: viewer/package-lock.json
+      - name: Build the viewer
+        working-directory: viewer
+        run: |
+          npm ci
+          node build.mjs
+          node verify/query_vectors.mjs
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install -e ".[dev,bam]"
+      - name: The tag equals the package version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          version="$(python -c 'import flowcellar; print(flowcellar.__version__)')"
+          test "v${version}" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} but package version ${version}"; exit 1; }
+      - name: Lint, generated files, licences
+        run: |
+          ruff check src tests tools hatch_build.py
+          python tools/build_catalogue.py --check
+          python tools/build_docs.py --check
+          python tools/licence_check.py
+      - name: Tests
+        run: python -m pytest tests
+      - name: Build the source distribution, and the wheel from it
+        run: |
+          python -m pip install build twine
+          python -m build
+          python -m twine check --strict dist/*
+      - name: Check what is in them
+        run: python tools/check_dist.py dist/* --list
+      - name: The wheel works in an environment of its own, without the network
+        run: |
+          python -m venv "$RUNNER_TEMP/wheel-env"
+          "$RUNNER_TEMP/wheel-env/bin/python" -m pip install "$(ls dist/*.whl)[all]"
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/wheel-env/bin/python" "$GITHUB_WORKSPACE/tools/smoke_test.py" --installed
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    # only for a pushed version tag, and only in the repository PyPI trusts
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.repository == 'MustafaElshani/FlowCellar'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write          # trusted publishing: PyPI checks the identity of this job; nothing else is granted
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - name: Upload to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
